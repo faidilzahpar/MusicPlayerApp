@@ -13,6 +13,7 @@ namespace MusicPlayerApp.Views
     {
         private Song _currentSong;
         private bool isPaused = false;
+        bool _isDragging = false;
         DispatcherTimer _timer = new DispatcherTimer();
 
         public MainWindow()
@@ -112,6 +113,9 @@ namespace MusicPlayerApp.Views
 
         private void UpdateProgress(object sender, EventArgs e)
         {
+            if (_isDragging)
+                return;
+
             if (_currentSong == null)
                 return;
 
@@ -139,6 +143,39 @@ namespace MusicPlayerApp.Views
 
             CurrentTimeText.Text = TimeSpan.FromSeconds(posSec).ToString(@"mm\:ss");
             TotalTimeText.Text = TimeSpan.FromSeconds(lenSec).ToString(@"mm\:ss");
+        }
+
+        private void ProgressSlider_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            _isDragging = true;
+        }
+
+        private void ProgressSlider_PreviewMouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (App.Player.StreamHandle == 0) return;
+
+            double newSec = ProgressSlider.Value;
+            long newBytes = Bass.ChannelSeconds2Bytes(App.Player.StreamHandle, newSec);
+
+            Bass.ChannelSetPosition(App.Player.StreamHandle, newBytes);
+
+            _isDragging = false;
+        }
+
+        private void ProgressSlider_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (App.Player.StreamHandle == 0) return;
+
+            var pos = e.GetPosition(ProgressSlider);
+            double percent = pos.X / ProgressSlider.ActualWidth;
+
+            percent = Math.Clamp(percent, 0, 1);
+
+            double secHover = percent * ProgressSlider.Maximum;
+
+            string tooltipText = TimeSpan.FromSeconds(secHover).ToString(@"mm\:ss");
+
+            ProgressSlider.ToolTip = tooltipText;
         }
     }
 }

@@ -244,7 +244,11 @@
                         Minimum="0"
                         Maximum="100"
                         Value="0"
-                        Margin="0 0 0 4"/>
+                        Margin="0 0 0 4"
+                        PreviewMouseLeftButtonDown="ProgressSlider_PreviewMouseDown"
+                        PreviewMouseLeftButtonUp="ProgressSlider_PreviewMouseUp"
+                        MouseMove="ProgressSlider_MouseMove"
+                        IsMoveToPointEnabled="True" />
                     <Grid Margin="0 0 10 0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
