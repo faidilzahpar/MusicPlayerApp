@@ -84,31 +84,51 @@ namespace MusicPlayerApp.Views
         private void Next_Click(object sender, RoutedEventArgs e)
         {
             var songs = App.Music.GetAllSongs();
-            int index = songs.IndexOf(_currentSong);
+            if (_currentSong == null || songs.Count == 0) return;
 
-            if (index < songs.Count - 1)
-            {
-                _currentSong = songs[index + 1];
-                App.Music.PlaySong(_currentSong);
+            int index = songs.FindIndex(s => s.FilePath == _currentSong.FilePath);
+            if (index == -1) index = 0;
 
-                CurrentSongTitle.Text = _currentSong.Title;
-                CurrentSongArtist.Text = _currentSong.Artist;
-            }
-        } 
+            // wrap-around: jika index terakhir → kembali ke 0
+            int newIndex = (index + 1) % songs.Count;
+
+            _currentSong = songs[newIndex];
+            App.Music.PlaySong(_currentSong);
+
+            CurrentSongTitle.Text = _currentSong.Title;
+            CurrentSongArtist.Text = _currentSong.Artist;
+
+            NewPlayedList.SelectedIndex = newIndex;
+            NewPlayedList.ScrollIntoView(NewPlayedList.SelectedItem);
+
+            _timer.Stop();
+            _timer.Start();
+            isPaused = false;
+        }
 
         private void Prev_Click(object sender, RoutedEventArgs e)
         {
             var songs = App.Music.GetAllSongs();
-            int index = songs.IndexOf(_currentSong);
+            if (_currentSong == null || songs.Count == 0) return;
 
-            if (index > 0)
-            {
-                _currentSong = songs[index - 1];
-                App.Music.PlaySong(_currentSong);
+            int index = songs.FindIndex(s => s.FilePath == _currentSong.FilePath);
+            if (index == -1) index = 0;
 
-                CurrentSongTitle.Text = _currentSong.Title;
-                CurrentSongArtist.Text = _currentSong.Artist;
-            }
+            // wrap-around: jika index 0 → pindah ke index terakhir
+            int newIndex = (index - 1 + songs.Count) % songs.Count;
+
+            _currentSong = songs[newIndex];
+            App.Music.PlaySong(_currentSong);
+
+            CurrentSongTitle.Text = _currentSong.Title;
+            CurrentSongArtist.Text = _currentSong.Artist;
+
+            NewPlayedList.SelectedIndex = newIndex;
+            NewPlayedList.ScrollIntoView(NewPlayedList.SelectedItem);
+
+            _timer.Stop();
+            _timer.Start();
+            isPaused = false;
         }
 
         private void UpdateProgress(object sender, EventArgs e)
