@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +14,8 @@
     <PackageReference Include="ManagedBass.Aac" Version="4.0.2" />
     <PackageReference Include="ManagedBass.Flac" Version="4.0.2" />
     <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
+    <PackageReference Include="TagLibSharp" Version="2.3.0" />
+    <PackageReference Include="WindowsAPICodePack" Version="8.0.14" />
   </ItemGroup>
 
 </Project>

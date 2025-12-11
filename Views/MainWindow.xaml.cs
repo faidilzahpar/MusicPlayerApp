@@ -1,24 +1,30 @@
-﻿using System.Text;
+﻿using MusicPlayerApp.Controllers;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Forms;   
+using MessageBox = System.Windows.MessageBox; 
 
-namespace MusicPlayerApp
+namespace MusicPlayerApp.Views
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void ImportSongs_Click(object sender, RoutedEventArgs e)
+        {
+            using (var dialog = new FolderBrowserDialog())
+            {
+                dialog.Description = "Pilih folder musik";
+
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    App.Music.ImportSongsFromFolder(dialog.SelectedPath);
+
+                    MessageBox.Show("Lagu berhasil diimport dari:\n" + dialog.SelectedPath);
+                }
+            }
         }
     }
 }
