@@ -189,43 +189,37 @@
 
             <!-- List Lagu -->
             <ListView Grid.Row="3"
-                      x:Name="NewPlayedList"
-                      Background="Transparent"
-                      BorderThickness="0"
-                      ItemContainerStyle="{StaticResource MusicListItemStyle}">
-                <!-- Dummy items biar kelihatan di desain -->
-                <ListViewItem>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="60"/>
-                        </Grid.ColumnDefinitions>
+          x:Name="NewPlayedList"
+          Background="Transparent"
+          BorderThickness="0"
+          ItemContainerStyle="{StaticResource MusicListItemStyle}"
+          MouseDoubleClick="NewPlayedList_MouseDoubleClick">
 
-                        <TextBlock Text="▶" Grid.Column="0" VerticalAlignment="Center"/>
-                        <TextBlock Text="High is hope" Grid.Column="1"/>
-                        <TextBlock Text="Rhaima" Grid.Column="2"/>
-                        <TextBlock Text="5:32" Grid.Column="3" HorizontalAlignment="Right"/>
-                    </Grid>
-                </ListViewItem>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="60"/>
+                            </Grid.ColumnDefinitions>
 
-                <ListViewItem>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="60"/>
-                        </Grid.ColumnDefinitions>
+                            <TextBlock Text="▶" Grid.Column="0" VerticalAlignment="Center"/>
 
-                        <TextBlock Text="▶" Grid.Column="0" VerticalAlignment="Center"/>
-                        <TextBlock Text="Shape of you" Grid.Column="1"/>
-                        <TextBlock Text="Ed Sherpan" Grid.Column="2"/>
-                        <TextBlock Text="3:45" Grid.Column="3" HorizontalAlignment="Right"/>
-                    </Grid>
-                </ListViewItem>
+                            <TextBlock Text="{Binding Title}" Grid.Column="1" Foreground="White"/>
+                            <TextBlock Text="{Binding Artist}" Grid.Column="2" Foreground="#AEB7D3"/>
+
+                            <TextBlock Text="{Binding DurationFormatted}"
+                           Grid.Column="3"
+                           HorizontalAlignment="Right"
+                           Foreground="#AEB7D3"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+
             </ListView>
+
 
             <!-- BOTTOM MINI PLAYER -->
             <Grid Grid.Row="4" Background="#151C30">
@@ -239,28 +233,48 @@
                 <StackPanel Orientation="Horizontal" Margin="20 0" VerticalAlignment="Center">
                     <Ellipse Width="40" Height="40" Fill="#2A3550"/>
                     <StackPanel Margin="10 0">
-                        <TextBlock Text="All we know" Foreground="White"/>
-                        <TextBlock Text="Rhaima" Foreground="#AEB7D3" FontSize="11"/>
+                        <TextBlock Text="" Foreground="White" x:Name="CurrentSongTitle"/>
+                        <TextBlock Text="" Foreground="#AEB7D3" FontSize="11" x:Name="CurrentSongArtist"/>
                     </StackPanel>
                 </StackPanel>
 
                 <!-- Slider progress -->
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                    <Slider Minimum="0" Maximum="100" Value="30"
-                            Margin="0 0 0 4"/>
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                        <TextBlock Text="2:26" Foreground="#AEB7D3" FontSize="11"/>
-                        <TextBlock Text="7:26" Foreground="#AEB7D3" FontSize="11"
-                                   HorizontalAlignment="Right" Margin="0 0 10 0"/>
-                    </StackPanel>
+                    <Slider x:Name="ProgressSlider"
+                        Minimum="0"
+                        Maximum="100"
+                        Value="0"
+                        Margin="0 0 0 4"/>
+                    <Grid Margin="0 0 10 0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Current time -->
+                        <TextBlock x:Name="CurrentTimeText"
+                           Text="0:00"
+                           Foreground="#AEB7D3"
+                           FontSize="11"
+                           Grid.Column="0"
+                           HorizontalAlignment="Left"/> 
+
+                        <!-- Total duration -->
+                        <TextBlock x:Name="TotalTimeText"
+                           Text="0:00"
+                           Foreground="#AEB7D3"
+                           FontSize="11"
+                           Grid.Column="1"
+                           HorizontalAlignment="Right"/>
+                    </Grid>
                 </StackPanel>
 
-                <!-- Tombol kontrol (dummy) -->
+                <!-- Tombol kontrol -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal"
                             HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <Button Content="⏮" Width="30" Height="30" Margin="4"/>
-                    <Button Content="⏯" Width="30" Height="30" Margin="4"/>
-                    <Button Content="⏭" Width="30" Height="30" Margin="4"/>
+                    <Button Content="⏮" Width="30" Height="30" Margin="4" Click="Prev_Click"/>
+                    <Button Content="⏯" Width="30" Height="30" Margin="4" Click="PlayPause_Click"/>
+                    <Button Content="⏭" Width="30" Height="30" Margin="4" Click="Next_Click"/>
                 </StackPanel>
             </Grid>
 

@@ -4,7 +4,8 @@ namespace MusicPlayerApp.Services
 {
     public class AudioPlayerService
     {
-        private int _stream = 0;
+        private int _stream;
+        public int StreamHandle => _stream;
 
         public AudioPlayerService()
         {
@@ -13,30 +14,41 @@ namespace MusicPlayerApp.Services
 
         public void Play(string filePath)
         {
-            // Hentikan stream lama jika ada
-            if (_stream != 0)
-            {
-                Bass.ChannelStop(_stream);
-                Bass.StreamFree(_stream);
-            }
+            Stop(); // hentikan stream lama
 
-            // Buat stream baru
             _stream = Bass.CreateStream(filePath);
 
             if (_stream == 0)
             {
-                throw new Exception("Gagal memuat file audio: " + filePath);
+                // Jika gagal load
+                return;
             }
 
             Bass.ChannelPlay(_stream);
+        }
+
+        public void Pause()
+        {
+            if (_stream != 0)
+            {
+                Bass.ChannelPause(_stream);
+            }
+        }
+
+        public void Resume()
+        {
+            if (_stream != 0)
+            {
+                Bass.ChannelPlay(_stream); // Resume playback
+            }
         }
 
         public void Stop()
         {
             if (_stream != 0)
             {
-                Bass.ChannelStop(_stream);
-                Bass.StreamFree(_stream);
+                Bass.ChannelStop(_stream);     // stop audio
+                Bass.StreamFree(_stream);      // free stream
                 _stream = 0;
             }
         }
