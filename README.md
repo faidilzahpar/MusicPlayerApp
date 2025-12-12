@@ -16,7 +16,7 @@ Pastikan kamu sudah menginstall **Git**.
 git clone https://github.com/USERNAME/MusicPlayerApp.git
 cd MusicPlayerApp
 
-📦 2. Restore Dependencies (NuGet)
+## 📦 2. Restore Dependencies (NuGet)
 
 Project ini menggunakan beberapa library:
 
@@ -32,7 +32,7 @@ Jika belum ter-restore otomatis oleh Visual Studio, jalankan:
 
 dotnet restore
 
-🎧 3. Wajib Download bass.dll (Native Audio Engine)
+## 🎧 3. Wajib Download bass.dll (Native Audio Engine)
 
 ManagedBass membutuhkan file native bernama bass.dll agar pemutaran audio dapat berjalan.
 
@@ -45,7 +45,7 @@ Setelah selesai download, ekstrak lalu ambil file:
 
 bass24\x64\bass.dll
 
-📂 4. Tempatkan bass.dll di folder output aplikasi
+## 📂 4. Tempatkan bass.dll di folder output aplikasi
 
 Copy file bass.dll ke:
 
