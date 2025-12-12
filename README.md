@@ -18,7 +18,7 @@ cd MusicPlayerApp
 ```
 
 ---
-## 📦 2. Restore Dependencies (NuGet)
+## 📦 2. Dependencies (NuGet)
 
 Project ini menggunakan beberapa library:
 
@@ -38,7 +38,7 @@ https://www.un4seen.com/download.php?bass24
 
 Setelah selesai download, ekstrak lalu ambil file:
 ```
-bass24\\x64\\bass.dll
+bass24\x64\bass.dll
 ```
 ---
 ## 📂 4. Tempatkan bass.dll di folder output aplikasi
