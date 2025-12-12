@@ -53,3 +53,52 @@ atau jika menggunakan mode release:
 MusicPlayerApp/bin/Release/net8.0-windows/
 ```
 ⚠️ **Tanpa file ini aplikasi akan crash saat memutar lagu.**
+
+---
+## 🗄 5. Melihat Database SQLite
+
+Aplikasi ini menggunakan SQLite untuk menyimpan data lagu.  
+Untuk melihat isi database (`musicplayer.db`), Anda dapat menggunakan salah satu aplikasi berikut:
+
+### ✔ SQLiteStudio (Gratis & Mudah)
+Download di:
+https://sqlitestudio.pl/
+
+Cara membuka database:
+1. Buka SQLiteStudio  
+2. Klik **Database → Add a database**  
+3. Cari file:
+
+```
+%LOCALAPPDATA%/MusicPlayerApp/musicplayer.db
+```
+
+atau lokasi manual:
+
+```
+C:\Users\USERNAME\AppData\Local\MusicPlayerApp\musicplayer.db
+```
+
+4. Klik **OK**, database akan tampil.
+
+---
+
+### ✔ DB Browser for SQLite (Alternatif)
+Unduh di:
+https://sqlitebrowser.org/
+
+Cara membuka:
+1. Open Database  
+2. Pilih file `musicplayer.db`
+
+---
+
+### 📍 Lokasi Database
+
+Secara default, database tersimpan di:
+
+```
+C:\Users\<USERNAME>\AppData\Local\MusicPlayerApp\musicplayer.db
+```
+
+Jika Anda menjalankan aplikasi dalam mode Debug dan ingin memastikan lokasinya, aplikasi akan menampilkan MessageBox lokasi database saat startup.
