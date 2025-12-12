@@ -92,13 +92,53 @@ Cara membuka:
 2. Pilih file `musicplayer.db`
 
 ---
+### 📍 Lokasi Default Database
 
-### 📍 Lokasi Database
-
-Secara default, database tersimpan di:
+Secara umum, database berada di:
 
 ```
 C:\Users\<USERNAME>\AppData\Local\MusicPlayerApp\musicplayer.db
 ```
 
-Jika Anda menjalankan aplikasi dalam mode Debug dan ingin memastikan lokasinya, aplikasi akan menampilkan MessageBox lokasi database saat startup.
+---
+
+## 🔧 Menambahkan MessageBox untuk Mengecek Lokasi Database
+
+Jika file `musicplayer.db` tidak ditemukan di lokasi tersebut, Anda bisa menambahkan kode **MessageBox** berikut pada `App.xaml.cs` untuk menampilkan path database saat aplikasi dijalankan.
+
+---
+
+### 📌 Cara Menambahkan MessageBox untuk Cek Lokasi Database
+
+Buka file:
+
+```
+App.xaml.cs
+```
+
+Lalu tambahkan kode ini setelah inisialisasi database:
+
+```csharp
+string folder = Path.Combine(
+    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+    "MusicPlayerApp"
+);
+
+if (!Directory.Exists(folder))
+    Directory.CreateDirectory(folder);
+
+string dbPath = Path.Combine(folder, "musicplayer.db");
+
+// Inisialisasi database
+Db = new DatabaseService(dbPath);
+
+// 🔍 Tambahkan MessageBox untuk melihat path DB
+System.Windows.MessageBox.Show(
+    $"Database berada di lokasi berikut:\n{dbPath}",
+    "Lokasi Database",
+    MessageBoxButton.OK,
+    MessageBoxImage.Information
+);
+```
+Setelah path diketahui, fitur ini **boleh dihapus** agar tidak mengganggu pengguna.
+
