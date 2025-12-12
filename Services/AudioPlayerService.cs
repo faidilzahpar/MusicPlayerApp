@@ -62,7 +62,7 @@ namespace MusicPlayerApp.Services
         }
 
         // ================================================================
-        // SEEK / SET POSITION (untuk slider)
+        // SEEK / SET POSITION
         // ================================================================
         public void Seek(double seconds)
         {
@@ -88,5 +88,12 @@ namespace MusicPlayerApp.Services
             long len = Bass.ChannelGetLength(_stream);
             return Bass.ChannelBytes2Seconds(_stream, len);
         }
+
+    
+        public double GetTotalDurationSeconds() => GetLengthSeconds();
+
+        public double GetCurrentPositionSeconds() => GetPositionSeconds();
+
+        public void SetPosition(double seconds) => Seek(seconds);
     }
 }
