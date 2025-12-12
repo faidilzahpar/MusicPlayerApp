@@ -27,6 +27,7 @@ Project ini menggunakan beberapa library:
 - SQLite-net-pcl  
 - WindowsAPICodePack-Shell  
 
+---
 ## 🎧 3. Wajib Download bass.dll (Native Audio Engine)
 
 ManagedBass membutuhkan file native bernama bass.dll agar pemutaran audio dapat berjalan.
