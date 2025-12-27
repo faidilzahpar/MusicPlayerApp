@@ -7,6 +7,8 @@ namespace MusicPlayerApp.Models
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
+        [Indexed(Unique = true)]
+        public string Signature { get; set; }
         public string Title { get; set; }
         public string FilePath { get; set; }
         public string Artist { get; set; }

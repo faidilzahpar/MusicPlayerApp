@@ -68,7 +68,7 @@ namespace MusicPlayerApp.Services
                 // 1. Ambil Judul
                 string title = tfile.Tag.Title ?? Path.GetFileNameWithoutExtension(filePath);
 
-                // 2. Ambil Artis (Logika kamu sudah bagus)
+                // 2. Ambil Artis
                 string artist =
                     tfile.Tag.FirstAlbumArtist ??
                     tfile.Tag.FirstArtist ??
@@ -87,29 +87,48 @@ namespace MusicPlayerApp.Services
                 FileInfo fileInfo = new FileInfo(filePath);
                 DateTime dateAdded = fileInfo.CreationTime;
 
+                string signature = GenerateSignature(filePath, duration);
+
                 return new Song
                 {
+                    Signature = signature,  
                     Title = title,
                     Artist = artist,
-                    Album = album,          // Masukkan ke object
+                    Album = album,
                     Duration = duration,
                     FilePath = filePath,
-                    DateAdded = dateAdded   // Masukkan ke object
+                    DateAdded = dateAdded
                 };
             }
             catch (Exception)
             {
                 // Jika file rusak/corrupt, buat data dummy agar tidak error
+                double duration = 0;
+                string signature = GenerateSignature(filePath, duration);
+
                 return new Song
                 {
+                    Signature = signature,
                     Title = Path.GetFileNameWithoutExtension(filePath),
                     Artist = "Unknown",
                     Album = "Unknown",
-                    Duration = 0,
+                    Duration = duration,
                     FilePath = filePath,
-                    DateAdded = DateTime.Now // Default ke waktu sekarang
+                    DateAdded = DateTime.Now
                 };
+
             }
         }
+
+        private string GenerateSignature(string filePath, double duration)
+        {
+            var info = new FileInfo(filePath);
+
+            long fileSize = info.Length;
+            long roundedDuration = (long)Math.Round(duration);
+
+            return $"{fileSize}_{roundedDuration}";
+        }
+
     }
 }

@@ -1,10 +1,11 @@
-﻿using MusicPlayerApp.Services;
-using MusicPlayerApp.Controllers;
+﻿using MusicPlayerApp.Controllers;
+using MusicPlayerApp.Models;
+using MusicPlayerApp.Services;
 using MusicPlayerApp.Views;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using Forms = System.Windows.Forms;
-using System.Diagnostics;
 
 namespace MusicPlayerApp
 {
@@ -13,7 +14,7 @@ namespace MusicPlayerApp
         public static DatabaseService Db { get; private set; }
         public static AudioPlayerService Player { get; private set; }
         public static MusicController Music { get; private set; }
-
+        public static PlaylistController Playlists { get; private set; }
         public static string CurrentMusicFolder { get; set; }
         public static FileSystemWatcher Watcher { get; private set; }
         public static MainWindow MainUI { get; private set; }
@@ -37,6 +38,7 @@ namespace MusicPlayerApp
             Db = new DatabaseService(dbPath);
             Player = new AudioPlayerService();
             Music = new MusicController(Db, Player);
+            Playlists = new PlaylistController(Db);
 
             // === Coba baca folder musik dari config.txt ===
             string savedFolder = null;
@@ -87,9 +89,8 @@ namespace MusicPlayerApp
 
             CurrentMusicFolder = folderPath;
 
-            // Reset database dan scan folder
-            Music.ResetDatabase();
-            Music.ScanInitialFolder(folderPath);
+            // Sinkronisasi awal folder TANPA reset database
+            Music.SyncInitialFolder(folderPath);
 
             // Dispose watcher lama
             if (Watcher != null)
