@@ -100,6 +100,12 @@ namespace MusicPlayerApp.Services
             return _db.Table<Album>().Where(a => a.ArtistId == artistId).ToList();
         }
 
+        public List<Album> GetAllAlbums()
+        {
+            // Mengambil semua album
+            return _db.Table<Album>().ToList();
+        }
+
         /// <summary>
         /// Logika Cerdas: Cek Album berdasarkan Judul DAN Artis.
         /// (Album "Greatest Hits" milik Queen beda dengan "Greatest Hits" milik Bon Jovi)

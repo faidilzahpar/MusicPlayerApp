@@ -9,17 +9,17 @@
 
     <Window.Resources>
 
-        <Style x:Key="SidebarButtonStyle" TargetType="{x:Type Button}">
+        <Style x:Key="SidebarButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#AEB7D3"/>
+            <Setter Property="Foreground" Value="#6F7A95"/>
+            <Setter Property="FontWeight" Value="Normal"/>
             <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="Medium"/>
             <Setter Property="Height" Value="40"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
+                    <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}" 
                         CornerRadius="8" 
                         Padding="15 0">
@@ -35,7 +35,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#2A3550"/>
+                                <Setter Property="Background" Value="#1F2940"/>
                                 <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -272,7 +272,10 @@
                     </StackPanel>
                 </Button>
 
-                <Button Click="DefaultLibrary_Click" Style="{StaticResource SidebarButtonStyle}" ToolTip="Default Windows Music Folder">
+                <Button x:Name="BtnDefaultLibrary" 
+        Click="DefaultLibrary_Click" 
+        Style="{StaticResource SidebarButtonStyle}" 
+        ToolTip="Default Windows Music Folder">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="📁" Margin="0 0 15 0"/>
                         <TextBlock Text="Music (Default)"/>
@@ -283,9 +286,9 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Button Style="{StaticResource SidebarButtonStyle}" 
-                            Click="DynamicFolder_Click" 
-                            Tag="{Binding Path}" 
-                            ToolTip="{Binding Path}">
+                    Click="DynamicFolder_Click" 
+                    Tag="{Binding Path}" 
+                    ToolTip="{Binding Path}">
                                 <StackPanel Orientation="Horizontal">
                                     <TextBlock Text="📂" Margin="0 0 15 0"/>
                                     <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
@@ -616,53 +619,30 @@
                 </ListView>
             </Grid>
 
-            <Grid x:Name="MainContentView"
-                  Grid.Row="0"
-                  Margin="20 20 20 0"
-                  Visibility="Visible">
+            <Grid x:Name="MainContentView" Grid.Row="0" Margin="20 20 20 0" Visibility="Visible">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Row="1" Text="Music" FontSize="20" Foreground="White" Margin="0 10 0 10"/>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0 10 0 10">
+                    <Button x:Name="BtnBack" Click="BtnBack_Click" Visibility="Collapsed"
+                Style="{StaticResource IconButtonStyle}" Margin="0 0 15 0" ToolTip="Back">
+                        <TextBlock Text="⬅" Foreground="White" FontSize="18"/>
+                    </Button>
+                    <TextBlock x:Name="PageTitle" Text="All Songs" FontSize="22" FontWeight="Bold" Foreground="White"/>
+                </StackPanel>
 
-                <ListView Grid.Row="2"
-                          x:Name="NewPlayedList"
-                          Background="Transparent"
-                          BorderThickness="0"
-                          MouseDoubleClick="NewPlayedList_MouseDoubleClick"
-                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          ScrollViewer.VerticalScrollBarVisibility="Auto"
-                          Margin="0 0 0 10" av:ItemsSource="{av:SampleData ItemCount=5}">
+                <ListView Grid.Row="1" x:Name="NewPlayedList"
+              Background="Transparent" BorderThickness="0"
+              ItemContainerStyle="{StaticResource MusicListItemStyle}"
+              MouseDoubleClick="NewPlayedList_MouseDoubleClick"
+              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+              ScrollViewer.VerticalScrollBarVisibility="Auto" av:ItemsSource="{av:SampleData ItemCount=5}">
 
                     <ListView.Resources>
-                        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ModernScrollBarStyle}"/>
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource ModernScrollBarStyle}"/>
                     </ListView.Resources>
-
-                    <ListView.ItemContainerStyle>
-                        <StaticResource ResourceKey="MusicListItemStyle"/>
-                    </ListView.ItemContainerStyle>
-
-                    <ListView.GroupStyle>
-                        <GroupStyle>
-                            <GroupStyle.HeaderTemplate>
-                                <DataTemplate>
-                                    <Border Background="#1F2940" Padding="15 8" Margin="0 15 0 8" CornerRadius="6">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Border Width="4" Height="18" Background="#5CD1FF" CornerRadius="2" Margin="0 0 10 0"/>
-
-                                            <TextBlock Text="{Binding Name}" 
-                                                       Foreground="White" 
-                                                       FontWeight="Bold" 
-                                                       FontSize="24"/>
-                                        </StackPanel>
-                                    </Border>
-                                </DataTemplate>
-                            </GroupStyle.HeaderTemplate>
-                        </GroupStyle>
-                    </ListView.GroupStyle>
 
                     <ListView.ItemTemplate>
                         <DataTemplate>
@@ -673,26 +653,138 @@
                                     <ColumnDefinition Width="150"/>
                                     <ColumnDefinition Width="60"/>
                                 </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="▶" Grid.Column="0" VerticalAlignment="Center" 
-                                           Foreground="#5CD1FF" FontSize="10" Opacity="0.8"/>
-
-                                <TextBlock Text="{Binding Title}" Grid.Column="1" 
-                                           Foreground="White" FontSize="14" FontWeight="SemiBold"
-                                           TextTrimming="CharacterEllipsis"/>
-
-                                <TextBlock Text="{Binding Artist}" Grid.Column="2" 
-                                           Foreground="#AEB7D3" FontSize="13"
-                                           TextTrimming="CharacterEllipsis"/>
-
-                                <TextBlock Text="{Binding DurationFormatted}" 
-                                           Grid.Column="3"
-                                           HorizontalAlignment="Right"
-                                           Foreground="#6F7A95" FontSize="13" FontWeight="Medium"/>
+                                <TextBlock Text="▶" Grid.Column="0" VerticalAlignment="Center" Foreground="#5CD1FF" FontSize="10" Opacity="0.8"/>
+                                <TextBlock Text="{Binding Title}" Grid.Column="1" Foreground="White" FontSize="14" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding Artist}" Grid.Column="2" Foreground="#AEB7D3" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding DurationFormatted}" Grid.Column="3" HorizontalAlignment="Right" Foreground="#6F7A95" FontSize="13" FontWeight="Medium"/>
                             </Grid>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+
+                <ListBox Grid.Row="1" x:Name="CardGridView"
+         Background="Transparent" BorderThickness="0"
+         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+         ScrollViewer.VerticalScrollBarVisibility="Auto"
+         Visibility="Collapsed"
+         SelectionChanged="CardGridView_SelectionChanged">
+
+                    <ListBox.Resources>
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource ModernScrollBarStyle}"/>
+                    </ListBox.Resources>
+
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" IsItemsHost="True"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="10"/>
+                            <Setter Property="Margin" Value="0 0 10 10"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Border Background="{TemplateBinding Background}" CornerRadius="8" Cursor="Hand">
+                                            <ContentPresenter/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#1F2940"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Width="160" Height="220">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="160"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <Border Grid.Row="0" CornerRadius="8" Background="#2A3550" Margin="0 0 0 10" ClipToBounds="True">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="10" Color="Black" Opacity="0.3" ShadowDepth="3"/>
+                                    </Border.Effect>
+
+                                    <Grid>
+                                        <Path Data="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"
+                              Fill="#3E4C6E" 
+                              Stretch="Uniform" 
+                              Width="60" Height="60"
+                              HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                                        <Image Source="{Binding CoverPath}" 
+                               Stretch="UniformToFill"/>
+                                    </Grid>
+                                </Border>
+
+                                <StackPanel Grid.Row="1" VerticalAlignment="Top">
+                                    <TextBlock Text="{Binding Title}" Foreground="White" FontWeight="Bold" FontSize="14" 
+                               TextTrimming="CharacterEllipsis" ToolTip="{Binding Title}"/>
+                                    <TextBlock Text="{Binding Subtitle}" Foreground="#AEB7D3" FontSize="12" 
+                               TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Grid Grid.Row="1" x:Name="DetailView" Visibility="Collapsed">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="250"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0 0 30 0">
+                        <Border Width="200" Height="200" CornerRadius="12" Background="#2A3550" HorizontalAlignment="Left">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="20" Color="Black" Opacity="0.5"/>
+                            </Border.Effect>
+                            <Image x:Name="DetailCoverImage" Stretch="UniformToFill"/>
+                        </Border>
+
+                        <TextBlock x:Name="DetailTitle" Text="Nama Album" Foreground="White" FontSize="24" FontWeight="Bold" 
+                       Margin="0 20 0 5" TextWrapping="Wrap"/>
+
+                        <TextBlock x:Name="DetailSubtitle" Text="Nama Artis • 2024" Foreground="#AEB7D3" FontSize="16" 
+                       Margin="0 0 0 20"/>
+
+                        <Button x:Name="BtnPlayAllDetail" Content="Play All" Click="BtnPlayAllDetail_Click"
+                    Style="{StaticResource SidebarButtonStyle}" 
+                    Background="#5CD1FF" Foreground="#1B2338" FontWeight="Bold" HorizontalAlignment="Left" Width="120"/>
+                    </StackPanel>
+
+                    <ListView Grid.Column="1" x:Name="DetailSongList"
+                  Background="Transparent" BorderThickness="0"
+                  ItemContainerStyle="{StaticResource MusicListItemStyle}"
+                  MouseDoubleClick="DetailSongList_MouseDoubleClick"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0 4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="40"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="60"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding TrackNumber}" Grid.Column="0" VerticalAlignment="Center" Foreground="#6F7A95" FontSize="12"/>
+                                    <TextBlock Text="{Binding Title}" Grid.Column="1" Foreground="White" FontSize="14"/>
+                                    <TextBlock Text="{Binding DurationFormatted}" Grid.Column="2" HorizontalAlignment="Right" Foreground="#6F7A95"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+
             </Grid>
 
             <Grid Grid.Row="1" Background="#151C30" Height="85" VerticalAlignment="Bottom">
