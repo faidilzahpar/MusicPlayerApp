@@ -1624,5 +1624,56 @@ namespace MusicPlayerApp.Views
             if (parentObject is T parent) return parent;
             return FindParent<T>(parentObject);
         }
+
+        //klik kanan baris lagu
+        // 1. Event Handler untuk Klik Kanan pada Baris Lagu (Grid)
+        private void SongRow_RightClick(object sender, MouseButtonEventArgs e)
+        {
+            // Mencegah event bubbling (agar tidak bentrok dengan event lain)
+            e.Handled = true;
+
+            // Sender adalah Grid pembungkus baris lagu
+            if (sender is Grid grid)
+            {
+                // Cari tombol titik tiga (kita beri nama "BtnMoreOptions" di XAML nanti)
+                // atau kita cari tombol apapun yang punya Style "IconButtonStyle" / ContextMenu
+
+                // Cara paling aman: Cari tombol berdasarkan nama x:Name yang akan kita pasang
+                var btn = FindVisualChild<Button>(grid, "BtnMoreOptions");
+
+                if (btn != null)
+                {
+                    // Panggil logika SongMenu_Click seolah-olah tombol itu diklik
+                    SongMenu_Click(btn, new RoutedEventArgs());
+                }
+            }
+        }
+
+        // 2. Helper untuk mencari elemen UI (Button) di dalam elemen lain (Grid)
+        private static T FindVisualChild<T>(DependencyObject parent, string childName) where T : DependencyObject
+        {
+            if (parent == null) return null;
+
+            int childrenCount = VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < childrenCount; i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+
+                // Cek jika child adalah tipe yang dicari (Button) DAN namanya sesuai
+                if (child is T typedChild)
+                {
+                    if (child is FrameworkElement frameworkElement && frameworkElement.Name == childName)
+                    {
+                        return typedChild;
+                    }
+                }
+
+                // Recursive (Cari ke dalam anak-anaknya lagi)
+                var result = FindVisualChild<T>(child, childName);
+                if (result != null)
+                    return result;
+            }
+            return null;
+        }
     }
 }
