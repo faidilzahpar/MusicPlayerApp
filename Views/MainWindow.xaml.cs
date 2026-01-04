@@ -7,7 +7,7 @@ using System.IO;                  // Untuk MemoryStream
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using WinForms = System.Windows.Forms; // Gunakan Alias agar tidak bentrok
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;       // Untuk ImageBrush & Colors
 using System.Windows.Media.Imaging; // Untuk BitmapImage
@@ -15,6 +15,7 @@ using System.Windows.Threading;
 // Tambahkan baris ini untuk menegaskan bahwa 'Button' adalah milik WPF
 using Button = System.Windows.Controls.Button;
 using MessageBox = System.Windows.MessageBox;
+using WinForms = System.Windows.Forms; // Gunakan Alias agar tidak bentrok
 using WpfApp = System.Windows.Application;
 
 namespace MusicPlayerApp.Views
@@ -1334,7 +1335,7 @@ namespace MusicPlayerApp.Views
             return null;
         }
 
-        // 1. Saat tombol titik tiga diklik
+        // 1. TRIGGER UTAMA: Saat tombol titik tiga diklik
         private void SongMenu_Click(object sender, RoutedEventArgs e)
         {
             var button = sender as Button;
@@ -1345,68 +1346,283 @@ namespace MusicPlayerApp.Views
 
             if (button.ContextMenu != null)
             {
-                button.ContextMenu.DataContext = song; // Kirim data lagu ke menu
+                button.ContextMenu.DataContext = song; // Pass data lagu ke menu
 
-                // Ubah teks menu Like/Unlike dinamis
+                // A. Update Teks Like (Dynamic)
                 var likeItem = button.ContextMenu.Items[0] as MenuItem;
                 if (likeItem != null)
                 {
                     likeItem.Header = song.IsLiked ? "Remove from Liked Songs" : "Save to Liked Songs";
                 }
 
+                // B. POPULATE SUBMENU PLAYLIST (SPOTIFY STYLE)
+                // Kita cari item "Add to playlist" (Item ke-1 di array)
+                var addToPlaylistItem = button.ContextMenu.Items[1] as MenuItem;
+
+                if (addToPlaylistItem != null)
+                {
+                    // Panggil fungsi untuk mengisi submenu
+                    PopulatePlaylistSubMenu(addToPlaylistItem, song);
+                }
+
                 button.ContextMenu.IsOpen = true;
             }
         }
 
-        // 2. Klik Toggle Like
+        // 2. FUNGSI UNTUK MEMBUAT SUBMENU DINAMIS
+        private void PopulatePlaylistSubMenu(MenuItem parentItem, Song songToAdd)
+        {
+            parentItem.Items.Clear();
+
+            // 1. SEARCH BAR (STYLE KHUSUS AGAR FULL WIDTH)
+
+            // Container Pencarian
+            var searchContainer = new Border
+            {
+                // Warna sedikit lebih terang dari background menu (#1F2940) agar terlihat sebagai input area
+                Background = (Brush)new BrushConverter().ConvertFrom("#2A3655"),
+                CornerRadius = new CornerRadius(4),
+                Padding = new Thickness(8, 6, 8, 6),
+                Margin = new Thickness(8, 8, 8, 6), // Margin luar agar tidak nempel tepi
+                SnapsToDevicePixels = true
+            };
+
+            var searchGrid = new Grid();
+            searchGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(20) }); // Kolom Ikon
+            searchGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Input
+
+            // Ikon Kaca Pembesar
+            var searchIcon = new TextBlock
+            {
+                Text = "🔍",
+                Foreground = (Brush)new BrushConverter().ConvertFrom("#8F9BB3"),
+                VerticalAlignment = VerticalAlignment.Center,
+                FontSize = 10,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            Grid.SetColumn(searchIcon, 0);
+            searchGrid.Children.Add(searchIcon);
+
+            // TextBox Input
+            var searchBox = new TextBox
+            {
+                Background = Brushes.Transparent,
+                BorderThickness = new Thickness(0),
+                Foreground = Brushes.White,
+                CaretBrush = Brushes.White,
+                FontSize = 12, // Font size spotify agak kecil
+                VerticalContentAlignment = VerticalAlignment.Center,
+                Tag = parentItem
+            };
+
+            // Placeholder Logic
+            var placeholderText = new TextBlock
+            {
+                Text = "Find a playlist",
+                Foreground = (Brush)new BrushConverter().ConvertFrom("#8F9BB3"),
+                VerticalAlignment = VerticalAlignment.Center,
+                FontSize = 12,
+                IsHitTestVisible = false,
+                Margin = new Thickness(2, 0, 0, 0)
+            };
+
+            searchBox.TextChanged += (s, e) =>
+            {
+                placeholderText.Visibility = string.IsNullOrEmpty(searchBox.Text) ? Visibility.Visible : Visibility.Collapsed;
+                // Panggil logic filtering Anda
+                // SearchPlaylistMenu_TextChanged(searchBox, null); 
+            };
+
+            Grid.SetColumn(searchBox, 1);
+            Grid.SetColumn(placeholderText, 1);
+            searchGrid.Children.Add(searchBox);
+            searchGrid.Children.Add(placeholderText);
+
+            searchContainer.Child = searchGrid;
+
+            var searchMenuItem = new MenuItem
+            {
+                Header = searchContainer,
+                StaysOpenOnClick = true
+            };
+
+            // Trik XAML via Code: 
+            // Kita override Template khusus item ini agar TIDAK ADA kolom ikon di kirinya (Full Span)
+            var style = new Style(typeof(MenuItem));
+            var template = new ControlTemplate(typeof(MenuItem));
+            var factory = new FrameworkElementFactory(typeof(ContentPresenter));
+            factory.SetValue(ContentPresenter.ContentSourceProperty, "Header");
+            template.VisualTree = factory;
+            style.Setters.Add(new Setter(MenuItem.TemplateProperty, template));
+            style.Setters.Add(new Setter(MenuItem.BackgroundProperty, Brushes.Transparent)); // Hilangkan hover biru pada search bar
+
+            searchMenuItem.Style = style; // Terapkan style custom
+
+            parentItem.Items.Add(searchMenuItem);
+
+            // 2. NEW PLAYLIST BUTTON (Desain Compact)
+            var newPlaylistItem = new MenuItem
+            {
+                Header = new TextBlock
+                {
+                    Text = "New playlist",
+                    FontWeight = FontWeights.SemiBold
+                },
+                // Gunakan ikon plus SVG atau Text
+                Icon = new TextBlock { Text = "+", FontSize = 16, FontWeight = FontWeights.Bold, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center, Foreground = Brushes.White }
+            };
+            newPlaylistItem.Click += (s, e) => CreateNewPlaylist_FromContext(songToAdd);
+            parentItem.Items.Add(newPlaylistItem);
+            // 3. SEPARATOR
+            var separatorBorder = new Border
+            {
+                Height = 1,
+                Background = (Brush)new BrushConverter().ConvertFrom("#3E4C6E"), // Warna separator sesuai XAML Anda
+                Margin = new Thickness(0, 6, 0, 6) // Jarak vertikal
+            };
+
+            var separatorItem = new MenuItem
+            {
+                Header = separatorBorder,
+                Style = style, // <--- PENTING: Gunakan style 'Full Width' yang sama dengan Search Bar
+                IsHitTestVisible = false // Agar tidak bisa diklik/hover
+            };
+
+            parentItem.Items.Add(separatorItem);
+
+            // 4. LIST PLAYLIST DARI DB
+            var playlists = App.Playlists.GetAllPlaylists();
+            foreach (var pl in playlists)
+            {
+                var item = new MenuItem
+                {
+                    Header = pl.Name,
+                    Tag = pl,
+                    DataContext = songToAdd
+                };
+
+                // Agar teksnya rata kiri (tidak menjorok)
+                item.Style = (Style)parentItem.FindResource("PlainMenuItemStyle");
+
+                item.Click += Context_AddToSpecificPlaylist_Click;
+                parentItem.Items.Add(item);
+            }
+        }
+
+        // 3. LOGIC PENCARIAN DI DALAM MENU
+        private void SearchPlaylistMenu_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if (textBox == null) return;
+
+            string query = textBox.Text.ToLower();
+            if (query == "find a playlist") return; // Abaikan placeholder
+
+            var parentMenu = textBox.Tag as MenuItem; // Ambil parent yang kita simpan di Tag
+            if (parentMenu == null) return;
+
+            // Loop semua item di submenu mulai dari index 3 (setelah Search, New, Separator)
+            for (int i = 3; i < parentMenu.Items.Count; i++)
+            {
+                if (parentMenu.Items[i] is MenuItem item)
+                {
+                    string playlistName = item.Header.ToString().ToLower();
+
+                    // Filter: Sembunyikan yang tidak cocok
+                    item.Visibility = playlistName.Contains(query) ? Visibility.Visible : Visibility.Collapsed;
+                }
+            }
+        }
+
+        // 4. LOGIC KLIK SALAH SATU PLAYLIST (Action Akhir)
+        private void Context_AddToSpecificPlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            var menuItem = sender as MenuItem;
+            var playlist = menuItem?.Tag as Playlist; // Ambil Playlist dari Tag
+            var song = menuItem?.DataContext as Song; // Ambil Lagu dari DataContext
+
+            if (playlist != null && song != null)
+            {
+                // Cek Duplikasi
+                var existing = App.Playlists.GetSongsInPlaylist(playlist.Id).Any(s => s.Id == song.Id);
+
+                if (!existing)
+                {
+                    App.Playlists.AddSongToPlaylist(playlist.Id, song);
+                    MessageBox.Show($"Added to playlist '{playlist.Name}'");
+                }
+                else
+                {
+                    MessageBox.Show("Song already in this playlist.");
+                }
+            }
+        }
+
+        // 5. LOGIC KLIK "NEW PLAYLIST" DARI MENU
+        private void CreateNewPlaylist_FromContext(Song songToAdd)
+        {
+            var dialog = new CreatePlaylistDialog { Owner = this };
+            if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.PlaylistName))
+            {
+                App.Playlists.CreatePlaylist(dialog.PlaylistName);
+
+                // Ambil ID playlist yang baru dibuat (paling terakhir)
+                var newPl = App.Playlists.GetAllPlaylists().LastOrDefault();
+                if (newPl != null)
+                {
+                    App.Playlists.AddSongToPlaylist(newPl.Id, songToAdd);
+                    MessageBox.Show($"Created '{newPl.Name}' and added song.");
+                }
+            }
+        }
+
+        // Logic: Toggle Like dari Menu
         private void Context_ToggleLike_Click(object sender, RoutedEventArgs e)
         {
             var menuItem = sender as MenuItem;
+            // DataContext menu item biasanya null jika ada di dalam ContextMenu yang kompleks,
+            // jadi kita ambil dari ContextMenu parent-nya
+            var contextMenu = FindParent<ContextMenu>(menuItem);
+
+            // Atau cara lebih aman yang kita pakai di SongMenu_Click (DataContext di-pass ke menu)
             var song = menuItem?.DataContext as Song;
+
+            // Jika null, coba ambil dari parent context menu
+            if (song == null && contextMenu != null)
+            {
+                song = contextMenu.DataContext as Song;
+            }
 
             if (song != null)
             {
+                // 1. Toggle status
                 song.IsLiked = !song.IsLiked;
+
+                // 2. Simpan ke Database
                 App.Db.ToggleLike(song.Id, song.IsLiked);
 
-                // Refresh halaman jika sedang di tab Liked Songs
+                // 3. Feedback Visual (Optional)
+                // string status = song.IsLiked ? "Saved to Liked Songs" : "Removed from Liked Songs";
+                // MessageBox.Show(status);
+
+                // 4. Jika sedang membuka halaman "Liked Songs", refresh agar lagu langsung hilang/muncul
                 if (_currentViewMode == "Liked")
                 {
                     // Reload manual
                     var likedSongs = App.Db.GetLikedSongs();
+                    NewPlayedList.ItemsSource = null;
                     NewPlayedList.ItemsSource = likedSongs;
                 }
             }
         }
 
-        // 3. Klik Add to Playlist
-        private void Context_AddToPlaylist_Click(object sender, RoutedEventArgs e)
+        // Helper kecil untuk mencari Parent di Visual Tree (Jaga-jaga jika diperlukan)
+        public static T FindParent<T>(DependencyObject child) where T : DependencyObject
         {
-            var menuItem = sender as MenuItem;
-            var song = menuItem?.DataContext as Song;
-
-            if (song != null)
-            {
-                // Buka Dialog AddToPlaylist yang sudah kita buat sebelumnya
-                var dialog = new AddToPlaylistDialog { Owner = this };
-
-                if (dialog.ShowDialog() == true && dialog.SelectedPlaylist != null)
-                {
-                    var pl = dialog.SelectedPlaylist;
-                    // Cek duplikasi
-                    var existing = App.Playlists.GetSongsInPlaylist(pl.Id).Any(s => s.Id == song.Id);
-
-                    if (!existing)
-                    {
-                        App.Playlists.AddSongToPlaylist(pl.Id, song);
-                        MessageBox.Show($"Saved to playlist '{pl.Name}'");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Lagu sudah ada di playlist ini.");
-                    }
-                }
-            }
+            DependencyObject parentObject = LogicalTreeHelper.GetParent(child);
+            if (parentObject == null) return null;
+            if (parentObject is T parent) return parent;
+            return FindParent<T>(parentObject);
         }
     }
 }

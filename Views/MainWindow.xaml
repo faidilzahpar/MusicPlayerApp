@@ -8,9 +8,8 @@
             xmlns:local="clr-namespace:MusicPlayerApp"
             WindowStartupLocation="CenterScreen">
 
-        <Window.Resources>
-
-            <Style x:Key="SidebarButtonStyle" TargetType="Button">
+    <Window.Resources>
+        <Style x:Key="SidebarButtonStyle" TargetType="Button">
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Foreground" Value="#6F7A95"/>
                 <Setter Property="FontWeight" Value="Normal"/>
@@ -665,63 +664,108 @@
                                     Cursor="Hand"
                                     Click="SongMenu_Click">
                                     <Button.ContextMenu>
-                                        <ContextMenu>
+                                        <ContextMenu x:Name="SongContextMenu">
                                             <ContextMenu.Resources>
-                                                <Style TargetType="{x:Type ContextMenu}">
-                                                    <Setter Property="SnapsToDevicePixels" Value="True" />
-                                                    <Setter Property="OverridesDefaultStyle" Value="True" />
-                                                    <Setter Property="Grid.IsSharedSizeScope" Value="true" />
-                                                    <Setter Property="HasDropShadow" Value="True" />
-                                                    <Setter Property="Template">
-                                                        <Setter.Value>
-                                                            <ControlTemplate TargetType="{x:Type ContextMenu}">
-                                                                <Border x:Name="Border" Background="#1F2940" 
-                                    BorderThickness="1" BorderBrush="#3E4C6E" 
-                                    CornerRadius="8" Padding="4">
-                                                                    <Border.Effect>
-                                                                        <DropShadowEffect BlurRadius="15" Color="Black" Opacity="0.4" ShadowDepth="4"/>
-                                                                    </Border.Effect>
-                                                                    <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
-                                                                </Border>
-                                                            </ControlTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Style>
-
                                                 <Style TargetType="{x:Type MenuItem}">
-                                                    <Setter Property="OverridesDefaultStyle" Value="True"/>
-                                                    <Setter Property="Header" Value="{Binding Header}"/>
-                                                    <Setter Property="Foreground" Value="White"/>
+                                                    <Setter Property="Foreground" Value="#E0E0E0"/>
                                                     <Setter Property="FontSize" Value="13"/>
+                                                    <Setter Property="FontWeight" Value="Medium"/>
                                                     <Setter Property="Cursor" Value="Hand"/>
                                                     <Setter Property="Template">
                                                         <Setter.Value>
                                                             <ControlTemplate TargetType="{x:Type MenuItem}">
-                                                                <Border x:Name="Border" Padding="12 10" CornerRadius="4" Background="Transparent">
+                                                                <Border x:Name="Border" Padding="12,6" Background="Transparent">
                                                                     <Grid>
                                                                         <Grid.ColumnDefinitions>
-                                                                            <ColumnDefinition Width="24" SharedSizeGroup="Icon"/>
+                                                                            <ColumnDefinition Width="20"/>
                                                                             <ColumnDefinition Width="10"/>
                                                                             <ColumnDefinition Width="*"/>
+                                                                            <ColumnDefinition Width="Auto"/>
                                                                         </Grid.ColumnDefinitions>
 
-                                                                        <ContentPresenter Grid.Column="0" ContentSource="Icon" 
-                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                        <ContentPresenter Grid.Column="0" ContentSource="Icon" HorizontalAlignment="Center" VerticalAlignment="Center" Width="16" Height="16"/>
+                                                                        <ContentPresenter Grid.Column="2" ContentSource="Header" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
-                                                                        <ContentPresenter Grid.Column="2" ContentSource="Header" 
-                                                      HorizontalAlignment="Left" VerticalAlignment="Center"
-                                                      RecognizesAccessKey="True"/>
+                                                                        <Path x:Name="RightArrow" Grid.Column="3" Data="M0,0 L4,3.5 L0,7 Z" Fill="#AEB7D3" Margin="10,0,0,0" VerticalAlignment="Center" Visibility="Collapsed"/>
+
+                                                                        <Popup x:Name="PART_Popup" AllowsTransparency="True" Focusable="False" 
+                                   HorizontalOffset="2" VerticalOffset="-4"
+                                   IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" 
+                                   Placement="Right">
+                                                                            <Border Background="#1F2940" BorderThickness="1" BorderBrush="#3E4C6E" CornerRadius="8" Padding="2">
+                                                                                <ScrollViewer CanContentScroll="True" MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                                                                                    <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                                                                                </ScrollViewer>
+                                                                            </Border>
+                                                                        </Popup>
                                                                     </Grid>
                                                                 </Border>
                                                                 <ControlTemplate.Triggers>
                                                                     <Trigger Property="IsHighlighted" Value="True">
                                                                         <Setter TargetName="Border" Property="Background" Value="#3E4C6E"/>
-                                                                        <Setter Property="Foreground" Value="#5CD1FF"/>
+                                                                        <Setter Property="Foreground" Value="White"/>
                                                                     </Trigger>
-                                                                    <Trigger Property="IsEnabled" Value="False">
-                                                                        <Setter Property="Foreground" Value="#555"/>
+                                                                    <Trigger Property="Role" Value="SubmenuHeader">
+                                                                        <Setter TargetName="RightArrow" Property="Visibility" Value="Visible"/>
                                                                     </Trigger>
                                                                 </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+
+                                                <Style x:Key="PlainMenuItemStyle" TargetType="{x:Type MenuItem}">
+                                                    <Setter Property="Foreground" Value="#E0E0E0"/>
+                                                    <Setter Property="FontSize" Value="13"/>
+                                                    <Setter Property="FontWeight" Value="Medium"/>
+                                                    <Setter Property="Cursor" Value="Hand"/>
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="{x:Type MenuItem}">
+                                                                <Border x:Name="Border" Padding="12,8" Background="Transparent">
+                                                                    <Grid>
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="*"/>
+                                                                            <ColumnDefinition Width="Auto"/>
+                                                                        </Grid.ColumnDefinitions>
+
+                                                                        <ContentPresenter Grid.Column="0" ContentSource="Header" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+                                                                        <Path x:Name="RightArrow" Grid.Column="1" Data="M0,0 L4,3.5 L0,7 Z" Fill="#AEB7D3" Margin="10,0,0,0" VerticalAlignment="Center" Visibility="Collapsed"/>
+                                                                    </Grid>
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <Trigger Property="IsHighlighted" Value="True">
+                                                                        <Setter TargetName="Border" Property="Background" Value="#3E4C6E"/>
+                                                                        <Setter Property="Foreground" Value="White"/>
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                                
+                                                <Style TargetType="{x:Type Separator}">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="{x:Type Separator}">
+                                                                <Border Height="1" Background="#3E4C6E" Margin="0,6"/>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+
+                                                <Style TargetType="{x:Type ContextMenu}">
+                                                    <Setter Property="HasDropShadow" Value="True" />
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="{x:Type ContextMenu}">
+                                                                <Border Background="#1F2940" BorderThickness="1" BorderBrush="#3E4C6E" CornerRadius="8" Padding="0,4">
+                                                                    <Border.Effect>
+                                                                        <DropShadowEffect BlurRadius="12" Color="Black" Opacity="0.5" ShadowDepth="4"/>
+                                                                    </Border.Effect>
+                                                                    <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                                                                </Border>
                                                             </ControlTemplate>
                                                         </Setter.Value>
                                                     </Setter>
@@ -735,11 +779,13 @@
                                                 </MenuItem.Icon>
                                             </MenuItem>
 
-                                            <MenuItem Header="Add to Playlist..." Click="Context_AddToPlaylist_Click">
+                                            <MenuItem Header="Add to playlist" x:Name="MenuAddToPlaylist">
                                                 <MenuItem.Icon>
                                                     <Path Data="M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z" 
                       Fill="White" Stretch="Uniform" Width="14" Height="14"/>
                                                 </MenuItem.Icon>
+
+                                                <MenuItem Header="Loading..."/>
                                             </MenuItem>
 
                                         </ContextMenu>
@@ -801,63 +847,108 @@
                                     Cursor="Hand"
                                     Click="SongMenu_Click">
                                     <Button.ContextMenu>
-                                        <ContextMenu>
+                                        <ContextMenu x:Name="SongContextMenu">
                                             <ContextMenu.Resources>
-                                                <Style TargetType="{x:Type ContextMenu}">
-                                                    <Setter Property="SnapsToDevicePixels" Value="True" />
-                                                    <Setter Property="OverridesDefaultStyle" Value="True" />
-                                                    <Setter Property="Grid.IsSharedSizeScope" Value="true" />
-                                                    <Setter Property="HasDropShadow" Value="True" />
-                                                    <Setter Property="Template">
-                                                        <Setter.Value>
-                                                            <ControlTemplate TargetType="{x:Type ContextMenu}">
-                                                                <Border x:Name="Border" Background="#1F2940" 
-                                    BorderThickness="1" BorderBrush="#3E4C6E" 
-                                    CornerRadius="8" Padding="4">
-                                                                    <Border.Effect>
-                                                                        <DropShadowEffect BlurRadius="15" Color="Black" Opacity="0.4" ShadowDepth="4"/>
-                                                                    </Border.Effect>
-                                                                    <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
-                                                                </Border>
-                                                            </ControlTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Style>
-
                                                 <Style TargetType="{x:Type MenuItem}">
-                                                    <Setter Property="OverridesDefaultStyle" Value="True"/>
-                                                    <Setter Property="Header" Value="{Binding Header}"/>
-                                                    <Setter Property="Foreground" Value="White"/>
+                                                    <Setter Property="Foreground" Value="#E0E0E0"/>
                                                     <Setter Property="FontSize" Value="13"/>
+                                                    <Setter Property="FontWeight" Value="Medium"/>
                                                     <Setter Property="Cursor" Value="Hand"/>
                                                     <Setter Property="Template">
                                                         <Setter.Value>
                                                             <ControlTemplate TargetType="{x:Type MenuItem}">
-                                                                <Border x:Name="Border" Padding="12 10" CornerRadius="4" Background="Transparent">
+                                                                <Border x:Name="Border" Padding="12,6" Background="Transparent">
                                                                     <Grid>
                                                                         <Grid.ColumnDefinitions>
-                                                                            <ColumnDefinition Width="24" SharedSizeGroup="Icon"/>
+                                                                            <ColumnDefinition Width="20"/>
                                                                             <ColumnDefinition Width="10"/>
                                                                             <ColumnDefinition Width="*"/>
+                                                                            <ColumnDefinition Width="Auto"/>
                                                                         </Grid.ColumnDefinitions>
 
-                                                                        <ContentPresenter Grid.Column="0" ContentSource="Icon" 
-                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                        <ContentPresenter Grid.Column="0" ContentSource="Icon" HorizontalAlignment="Center" VerticalAlignment="Center" Width="16" Height="16"/>
+                                                                        <ContentPresenter Grid.Column="2" ContentSource="Header" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
-                                                                        <ContentPresenter Grid.Column="2" ContentSource="Header" 
-                                                      HorizontalAlignment="Left" VerticalAlignment="Center"
-                                                      RecognizesAccessKey="True"/>
+                                                                        <Path x:Name="RightArrow" Grid.Column="3" Data="M0,0 L4,3.5 L0,7 Z" Fill="#AEB7D3" Margin="10,0,0,0" VerticalAlignment="Center" Visibility="Collapsed"/>
+
+                                                                        <Popup x:Name="PART_Popup" AllowsTransparency="True" Focusable="False" 
+             HorizontalOffset="2" VerticalOffset="-4"
+             IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" 
+             Placement="Right">
+                                                                            <Border Background="#1F2940" BorderThickness="1" BorderBrush="#3E4C6E" CornerRadius="8" Padding="2">
+                                                                                <ScrollViewer CanContentScroll="True" MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                                                                                    <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                                                                                </ScrollViewer>
+                                                                            </Border>
+                                                                        </Popup>
                                                                     </Grid>
                                                                 </Border>
                                                                 <ControlTemplate.Triggers>
                                                                     <Trigger Property="IsHighlighted" Value="True">
                                                                         <Setter TargetName="Border" Property="Background" Value="#3E4C6E"/>
-                                                                        <Setter Property="Foreground" Value="#5CD1FF"/>
+                                                                        <Setter Property="Foreground" Value="White"/>
                                                                     </Trigger>
-                                                                    <Trigger Property="IsEnabled" Value="False">
-                                                                        <Setter Property="Foreground" Value="#555"/>
+                                                                    <Trigger Property="Role" Value="SubmenuHeader">
+                                                                        <Setter TargetName="RightArrow" Property="Visibility" Value="Visible"/>
                                                                     </Trigger>
                                                                 </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+
+                                                <Style x:Key="PlainMenuItemStyle" TargetType="{x:Type MenuItem}">
+                                                    <Setter Property="Foreground" Value="#E0E0E0"/>
+                                                    <Setter Property="FontSize" Value="13"/>
+                                                    <Setter Property="FontWeight" Value="Medium"/>
+                                                    <Setter Property="Cursor" Value="Hand"/>
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="{x:Type MenuItem}">
+                                                                <Border x:Name="Border" Padding="12,8" Background="Transparent">
+                                                                    <Grid>
+                                                                        <Grid.ColumnDefinitions>
+                                                                            <ColumnDefinition Width="*"/>
+                                                                            <ColumnDefinition Width="Auto"/>
+                                                                        </Grid.ColumnDefinitions>
+
+                                                                        <ContentPresenter Grid.Column="0" ContentSource="Header" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+                                                                        <Path x:Name="RightArrow" Grid.Column="1" Data="M0,0 L4,3.5 L0,7 Z" Fill="#AEB7D3" Margin="10,0,0,0" VerticalAlignment="Center" Visibility="Collapsed"/>
+                                                                    </Grid>
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <Trigger Property="IsHighlighted" Value="True">
+                                                                        <Setter TargetName="Border" Property="Background" Value="#3E4C6E"/>
+                                                                        <Setter Property="Foreground" Value="White"/>
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+
+                                                <Style TargetType="{x:Type Separator}">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="{x:Type Separator}">
+                                                                <Border Height="1" Background="#3E4C6E" Margin="0,6"/>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+
+                                                <Style TargetType="{x:Type ContextMenu}">
+                                                    <Setter Property="HasDropShadow" Value="True" />
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="{x:Type ContextMenu}">
+                                                                <Border Background="#1F2940" BorderThickness="1" BorderBrush="#3E4C6E" CornerRadius="8" Padding="0,4">
+                                                                    <Border.Effect>
+                                                                        <DropShadowEffect BlurRadius="12" Color="Black" Opacity="0.5" ShadowDepth="4"/>
+                                                                    </Border.Effect>
+                                                                    <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                                                                </Border>
                                                             </ControlTemplate>
                                                         </Setter.Value>
                                                     </Setter>
@@ -867,15 +958,17 @@
                                             <MenuItem Header="Save to Liked Songs" Click="Context_ToggleLike_Click">
                                                 <MenuItem.Icon>
                                                     <Path Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" 
-                      Fill="White" Stretch="Uniform" Width="14" Height="14"/>
+Fill="White" Stretch="Uniform" Width="14" Height="14"/>
                                                 </MenuItem.Icon>
                                             </MenuItem>
 
-                                            <MenuItem Header="Add to Playlist..." Click="Context_AddToPlaylist_Click">
+                                            <MenuItem Header="Add to playlist" x:Name="MenuAddToPlaylist">
                                                 <MenuItem.Icon>
                                                     <Path Data="M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z" 
-                      Fill="White" Stretch="Uniform" Width="14" Height="14"/>
+Fill="White" Stretch="Uniform" Width="14" Height="14"/>
                                                 </MenuItem.Icon>
+
+                                                <MenuItem Header="Loading..."/>
                                             </MenuItem>
 
                                         </ContextMenu>
@@ -1017,63 +1110,108 @@
                                         Cursor="Hand"
                                         Click="SongMenu_Click">
                                         <Button.ContextMenu>
-                                            <ContextMenu>
+                                            <ContextMenu x:Name="SongContextMenu">
                                                 <ContextMenu.Resources>
-                                                    <Style TargetType="{x:Type ContextMenu}">
-                                                        <Setter Property="SnapsToDevicePixels" Value="True" />
-                                                        <Setter Property="OverridesDefaultStyle" Value="True" />
-                                                        <Setter Property="Grid.IsSharedSizeScope" Value="true" />
-                                                        <Setter Property="HasDropShadow" Value="True" />
-                                                        <Setter Property="Template">
-                                                            <Setter.Value>
-                                                                <ControlTemplate TargetType="{x:Type ContextMenu}">
-                                                                    <Border x:Name="Border" Background="#1F2940" 
-                                    BorderThickness="1" BorderBrush="#3E4C6E" 
-                                    CornerRadius="8" Padding="4">
-                                                                        <Border.Effect>
-                                                                            <DropShadowEffect BlurRadius="15" Color="Black" Opacity="0.4" ShadowDepth="4"/>
-                                                                        </Border.Effect>
-                                                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
-                                                                    </Border>
-                                                                </ControlTemplate>
-                                                            </Setter.Value>
-                                                        </Setter>
-                                                    </Style>
-
                                                     <Style TargetType="{x:Type MenuItem}">
-                                                        <Setter Property="OverridesDefaultStyle" Value="True"/>
-                                                        <Setter Property="Header" Value="{Binding Header}"/>
-                                                        <Setter Property="Foreground" Value="White"/>
+                                                        <Setter Property="Foreground" Value="#E0E0E0"/>
                                                         <Setter Property="FontSize" Value="13"/>
+                                                        <Setter Property="FontWeight" Value="Medium"/>
                                                         <Setter Property="Cursor" Value="Hand"/>
                                                         <Setter Property="Template">
                                                             <Setter.Value>
                                                                 <ControlTemplate TargetType="{x:Type MenuItem}">
-                                                                    <Border x:Name="Border" Padding="12 10" CornerRadius="4" Background="Transparent">
+                                                                    <Border x:Name="Border" Padding="12,6" Background="Transparent">
                                                                         <Grid>
                                                                             <Grid.ColumnDefinitions>
-                                                                                <ColumnDefinition Width="24" SharedSizeGroup="Icon"/>
+                                                                                <ColumnDefinition Width="20"/>
                                                                                 <ColumnDefinition Width="10"/>
                                                                                 <ColumnDefinition Width="*"/>
+                                                                                <ColumnDefinition Width="Auto"/>
                                                                             </Grid.ColumnDefinitions>
 
-                                                                            <ContentPresenter Grid.Column="0" ContentSource="Icon" 
-                                                      HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                            <ContentPresenter Grid.Column="0" ContentSource="Icon" HorizontalAlignment="Center" VerticalAlignment="Center" Width="16" Height="16"/>
+                                                                            <ContentPresenter Grid.Column="2" ContentSource="Header" HorizontalAlignment="Left" VerticalAlignment="Center"/>
 
-                                                                            <ContentPresenter Grid.Column="2" ContentSource="Header" 
-                                                      HorizontalAlignment="Left" VerticalAlignment="Center"
-                                                      RecognizesAccessKey="True"/>
+                                                                            <Path x:Name="RightArrow" Grid.Column="3" Data="M0,0 L4,3.5 L0,7 Z" Fill="#AEB7D3" Margin="10,0,0,0" VerticalAlignment="Center" Visibility="Collapsed"/>
+
+                                                                            <Popup x:Name="PART_Popup" AllowsTransparency="True" Focusable="False" 
+             HorizontalOffset="2" VerticalOffset="-4"
+             IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}" 
+             Placement="Right">
+                                                                                <Border Background="#1F2940" BorderThickness="1" BorderBrush="#3E4C6E" CornerRadius="8" Padding="2">
+                                                                                    <ScrollViewer CanContentScroll="True" MaxHeight="300" VerticalScrollBarVisibility="Auto">
+                                                                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                                                                                    </ScrollViewer>
+                                                                                </Border>
+                                                                            </Popup>
                                                                         </Grid>
                                                                     </Border>
                                                                     <ControlTemplate.Triggers>
                                                                         <Trigger Property="IsHighlighted" Value="True">
                                                                             <Setter TargetName="Border" Property="Background" Value="#3E4C6E"/>
-                                                                            <Setter Property="Foreground" Value="#5CD1FF"/>
+                                                                            <Setter Property="Foreground" Value="White"/>
                                                                         </Trigger>
-                                                                        <Trigger Property="IsEnabled" Value="False">
-                                                                            <Setter Property="Foreground" Value="#555"/>
+                                                                        <Trigger Property="Role" Value="SubmenuHeader">
+                                                                            <Setter TargetName="RightArrow" Property="Visibility" Value="Visible"/>
                                                                         </Trigger>
                                                                     </ControlTemplate.Triggers>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+
+                                                    <Style x:Key="PlainMenuItemStyle" TargetType="{x:Type MenuItem}">
+                                                        <Setter Property="Foreground" Value="#E0E0E0"/>
+                                                        <Setter Property="FontSize" Value="13"/>
+                                                        <Setter Property="FontWeight" Value="Medium"/>
+                                                        <Setter Property="Cursor" Value="Hand"/>
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="{x:Type MenuItem}">
+                                                                    <Border x:Name="Border" Padding="12,8" Background="Transparent">
+                                                                        <Grid>
+                                                                            <Grid.ColumnDefinitions>
+                                                                                <ColumnDefinition Width="*"/>
+                                                                                <ColumnDefinition Width="Auto"/>
+                                                                            </Grid.ColumnDefinitions>
+
+                                                                            <ContentPresenter Grid.Column="0" ContentSource="Header" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+
+                                                                            <Path x:Name="RightArrow" Grid.Column="1" Data="M0,0 L4,3.5 L0,7 Z" Fill="#AEB7D3" Margin="10,0,0,0" VerticalAlignment="Center" Visibility="Collapsed"/>
+                                                                        </Grid>
+                                                                    </Border>
+                                                                    <ControlTemplate.Triggers>
+                                                                        <Trigger Property="IsHighlighted" Value="True">
+                                                                            <Setter TargetName="Border" Property="Background" Value="#3E4C6E"/>
+                                                                            <Setter Property="Foreground" Value="White"/>
+                                                                        </Trigger>
+                                                                    </ControlTemplate.Triggers>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+
+                                                    <Style TargetType="{x:Type Separator}">
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="{x:Type Separator}">
+                                                                    <Border Height="1" Background="#3E4C6E" Margin="0,6"/>
+                                                                </ControlTemplate>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Style>
+
+                                                    <Style TargetType="{x:Type ContextMenu}">
+                                                        <Setter Property="HasDropShadow" Value="True" />
+                                                        <Setter Property="Template">
+                                                            <Setter.Value>
+                                                                <ControlTemplate TargetType="{x:Type ContextMenu}">
+                                                                    <Border Background="#1F2940" BorderThickness="1" BorderBrush="#3E4C6E" CornerRadius="8" Padding="0,4">
+                                                                        <Border.Effect>
+                                                                            <DropShadowEffect BlurRadius="12" Color="Black" Opacity="0.5" ShadowDepth="4"/>
+                                                                        </Border.Effect>
+                                                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                                                                    </Border>
                                                                 </ControlTemplate>
                                                             </Setter.Value>
                                                         </Setter>
@@ -1083,15 +1221,17 @@
                                                 <MenuItem Header="Save to Liked Songs" Click="Context_ToggleLike_Click">
                                                     <MenuItem.Icon>
                                                         <Path Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" 
-                      Fill="White" Stretch="Uniform" Width="14" Height="14"/>
+Fill="White" Stretch="Uniform" Width="14" Height="14"/>
                                                     </MenuItem.Icon>
                                                 </MenuItem>
 
-                                                <MenuItem Header="Add to Playlist..." Click="Context_AddToPlaylist_Click">
+                                                <MenuItem Header="Add to playlist" x:Name="MenuAddToPlaylist">
                                                     <MenuItem.Icon>
                                                         <Path Data="M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z" 
-                      Fill="White" Stretch="Uniform" Width="14" Height="14"/>
+Fill="White" Stretch="Uniform" Width="14" Height="14"/>
                                                     </MenuItem.Icon>
+
+                                                    <MenuItem Header="Loading..."/>
                                                 </MenuItem>
 
                                             </ContextMenu>
