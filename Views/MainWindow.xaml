@@ -159,46 +159,57 @@
                 </Setter>
             </Style>
 
-            <Style x:Key="ModernScrollBarStyle" TargetType="{x:Type ScrollBar}">
-                <Setter Property="Stylus.IsFlicksEnabled" Value="false" />
-                <Setter Property="Foreground" Value="#5CD1FF" />
-                <Setter Property="Background" Value="Transparent" />
-                <Setter Property="Width" Value="8" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type ScrollBar}">
-                            <Grid x:Name="GridRoot" Width="8" Background="{TemplateBinding Background}">
-                                <Track x:Name="PART_Track" IsDirectionReversed="true" Focusable="false">
-                                    <Track.Thumb>
-                                        <Thumb x:Name="Thumb">
-                                            <Thumb.Template>
-                                                <ControlTemplate TargetType="{x:Type Thumb}">
-                                                    <Border CornerRadius="4" 
-                                                        Background="#4A5675" 
-                                                        Width="6"/>
-                                                </ControlTemplate>
-                                            </Thumb.Template>
-                                        </Thumb>
-                                    </Track.Thumb>
-                                    <Track.DecreaseRepeatButton>
-                                        <RepeatButton Command="ScrollBar.LineUpCommand" Opacity="0" Focusable="false"/>
-                                    </Track.DecreaseRepeatButton>
-                                    <Track.IncreaseRepeatButton>
-                                        <RepeatButton Command="ScrollBar.LineDownCommand" Opacity="0" Focusable="false"/>
-                                    </Track.IncreaseRepeatButton>
-                                </Track>
-                            </Grid>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="true">
-                                    <Setter TargetName="Thumb" Property="Background" Value="#6F7A95" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
+        <Style TargetType="{x:Type ScrollBar}">
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False" />
+            <Setter Property="Foreground" Value="#5CD1FF" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Width" Value="12" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid x:Name="GridRoot" Width="12" Background="{TemplateBinding Background}">
 
-            <Style x:Key="QueueToggleButtonStyle" TargetType="{x:Type ToggleButton}">
+                            <Track x:Name="PART_Track" IsDirectionReversed="true" Focusable="false">
+                                <Track.Thumb>
+                                    <Thumb x:Name="Thumb">
+                                        <Thumb.Style>
+                                            <Style TargetType="{x:Type Thumb}">
+                                                <Setter Property="OverridesDefaultStyle" Value="True"/>
+                                                <Setter Property="IsTabStop" Value="False"/>
+                                                <Setter Property="Cursor" Value="Hand"/>
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="{x:Type Thumb}">
+                                                            <Border x:Name="ThumbVisual" 
+                                                            CornerRadius="4" 
+                                                            Background="#4A5675" 
+                                                            Width="6" 
+                                                            Margin="0 2"
+                                                            HorizontalAlignment="Center"/>
+
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="ThumbVisual" Property="Background" Value="#6F7A95"/>
+                                                                </Trigger>
+                                                                <Trigger Property="IsDragging" Value="True">
+                                                                    <Setter TargetName="ThumbVisual" Property="Background" Value="#5CD1FF"/>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Thumb.Style>
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="QueueToggleButtonStyle" TargetType="{x:Type ToggleButton}">
                 <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="Foreground" Value="#AEB7D3"/>
                 <Setter Property="Cursor" Value="Hand"/>
@@ -687,6 +698,7 @@
 
                 <ListView Grid.Row="1"
                     x:Name="PlaylistSongList"
+                    VirtualizingPanel.ScrollUnit="Pixel"
                     MouseDoubleClick="PlaylistSongList_MouseDoubleClick"
                     Background="Transparent"
                     AllowDrop="True" 
@@ -877,16 +889,13 @@
                         <TextBlock x:Name="PageTitle" Text="All Songs" FontSize="22" FontWeight="Bold" Foreground="White"/>
                     </StackPanel>
 
-                    <ListView Grid.Row="1" x:Name="NewPlayedList"
+                <ListView Grid.Row="1" x:Name="NewPlayedList"
+                  VirtualizingPanel.ScrollUnit="Pixel"
                   Background="Transparent" BorderThickness="0"
                   ItemContainerStyle="{StaticResource MusicListItemStyle}"
                   MouseDoubleClick="NewPlayedList_MouseDoubleClick"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   ScrollViewer.VerticalScrollBarVisibility="Auto" av:ItemsSource="{av:SampleData ItemCount=5}">
-
-                        <ListView.Resources>
-                            <Style TargetType="ScrollBar" BasedOn="{StaticResource ModernScrollBarStyle}"/>
-                        </ListView.Resources>
 
                     <ListView.ItemTemplate>
                         <DataTemplate>
@@ -1045,18 +1054,14 @@ Fill="White" Stretch="Uniform" Width="14" Height="14"/>
                     </ListView.ItemTemplate>
                 </ListView>
 
-                    <ListBox Grid.Row="1" x:Name="CardGridView"
+                <ListBox Grid.Row="1" x:Name="CardGridView"
              Background="Transparent" BorderThickness="0"
              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
              ScrollViewer.VerticalScrollBarVisibility="Auto"
              Visibility="Collapsed"
              SelectionChanged="CardGridView_SelectionChanged">
 
-                        <ListBox.Resources>
-                            <Style TargetType="ScrollBar" BasedOn="{StaticResource ModernScrollBarStyle}"/>
-                        </ListBox.Resources>
-
-                        <ListBox.ItemsPanel>
+                    <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <WrapPanel Orientation="Horizontal" IsItemsHost="True"/>
                             </ItemsPanelTemplate>
@@ -1146,6 +1151,7 @@ Fill="White" Stretch="Uniform" Width="14" Height="14"/>
                         </StackPanel>
 
                         <ListView Grid.Column="1" x:Name="DetailSongList"
+                      VirtualizingPanel.ScrollUnit="Pixel"
                       Background="Transparent" BorderThickness="0"
                       ItemContainerStyle="{StaticResource MusicListItemStyle}"
                       MouseDoubleClick="DetailSongList_MouseDoubleClick"
@@ -1342,7 +1348,8 @@ Fill="White" Stretch="Uniform" Width="14" Height="14"/>
                         Click="BtnClearQueue_Click"/>
                         </Grid>
 
-                        <ListView Grid.Row="1" x:Name="QueueList"
+                    <ListView Grid.Row="1" x:Name="QueueList"
+              VirtualizingPanel.ScrollUnit="Pixel"
               Background="Transparent" BorderThickness="0"
               ScrollViewer.VerticalScrollBarVisibility="Auto"
               ItemContainerStyle="{StaticResource MusicListItemStyle}"
@@ -1355,11 +1362,7 @@ Fill="White" Stretch="Uniform" Width="14" Height="14"/>
               Drop="QueueList_Drop"
               MouseDoubleClick="QueueList_MouseDoubleClick">
 
-                            <ListBox.Resources>
-                                <Style TargetType="ScrollBar" BasedOn="{StaticResource ModernScrollBarStyle}"/>
-                            </ListBox.Resources>
-
-                            <ListView.ItemTemplate>
+                        <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="0 6">
                                         <Grid.ColumnDefinitions>
