@@ -114,17 +114,18 @@ namespace MusicPlayerApp.Views
 
         private void LoadSongs()
         {
+            // 1. Ambil lagu dari folder aktif (Database/Backend)
             var songs = App.Music.GetSongsByActiveFolder();
 
+            // 2. Masukkan ke memori (_allSongs)
             _allSongs.Clear();
             foreach (var song in songs)
                 _allSongs.Add(song);
 
-            // Bind SEKALI SAJA
-            if (NewPlayedList.ItemsSource == null)
-                NewPlayedList.ItemsSource = _allSongs;
+            // 3. Paksa UI (ListView) untuk menggunakan _allSongs lagi.
+            NewPlayedList.ItemsSource = _allSongs;
 
-            // Pastikan sorting default
+            // 4. Reset sorting agar tampilan default (tanpa filter aneh-aneh)
             ICollectionView view = CollectionViewSource.GetDefaultView(NewPlayedList.ItemsSource);
             view?.SortDescriptions.Clear();
             view?.GroupDescriptions.Clear();
