@@ -524,120 +524,179 @@
                                TextWrapping="Wrap" LineHeight="46"
                                Margin="0 0 0 10"/>
 
-                                <TextBlock x:Name="PlaylistCount"
+                            <TextBlock x:Name="PlaylistCount"
                                Text="0 songs"
                                FontSize="14" Foreground="#AEB7D3"
                                Margin="2 0 0 25"/>
+                                
+                            <StackPanel Orientation="Horizontal">
 
-                                <StackPanel Orientation="Horizontal">
+                                <Button x:Name="BtnPlayAll"
+            Width="50" Height="50"
+            Margin="0 0 15 0"
+            Background="#5CD1FF" 
+            BorderThickness="0"
+            Cursor="Hand" 
+            Click="BtnPlayAll_Click"
+            ToolTip="Play All">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <Grid>
+                                                <Ellipse Fill="{TemplateBinding Background}" Width="50" Height="50">
+                                                    <Ellipse.Effect>
+                                                        <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.3" Color="Black"/>
+                                                    </Ellipse.Effect>
+                                                </Ellipse>
+                                                <Path Data="M8 5v14l11-7z" 
+                          Fill="#1B2338" 
+                          Stretch="Uniform" 
+                          Width="20" Height="20" 
+                          Margin="4,0,0,0"
+                          HorizontalAlignment="Center" 
+                          VerticalAlignment="Center"/>
+                                            </Grid>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter Property="Background" Value="#8FE0FF"/>
+                                                </Trigger>
+                                                <Trigger Property="IsPressed" Value="True">
+                                                    <Setter Property="Background" Value="#4AB6E0"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
 
-                                    <Button Content="▶  Play All" x:Name="BtnPlayAll"
-                Padding="24 10" Margin="0 0 12 0"
-                Background="#5CD1FF" Foreground="#1B2338"
-                BorderThickness="0" FontWeight="Bold" FontSize="14"
-                Cursor="Hand" Click="BtnPlayAll_Click">
-                                        <Button.Resources>
-                                            <Style TargetType="{x:Type Border}">
-                                                <Setter Property="CornerRadius" Value="22"/>
-                                            </Style>
-                                        </Button.Resources>
-                                    </Button>
+                                <ToggleButton x:Name="BtnShufflePlaylist"
+            Width="50" Height="50"
+            Margin="0 0 15 0"
+            Background="#1B2338"
+            BorderThickness="0" 
+            Cursor="Hand"
+            Click="BtnShufflePlaylist_Click"
+            ToolTip="Shuffle Play">
+                                    <ToggleButton.Template>
+                                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                            <Border x:Name="Bd"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="25" 
+                        Width="50" Height="50">
+                                                <Border.Effect>
+                                                    <DropShadowEffect BlurRadius="5" ShadowDepth="1" Opacity="0.3" Color="Black"/>
+                                                </Border.Effect>
+                                                <Path x:Name="Icon" 
+                          Data="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"
+                          Fill="#5CD1FF"
+                          Stretch="Uniform"
+                          Width="22" Height="22"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="#2A3550"/>
+                                                </Trigger>
 
-                                    <Button Content="+ Add Songs" x:Name="BtnAddSongs"
-                Padding="18 10" Margin="0 0 12 0"
-                Background="Transparent" Foreground="White"
-                BorderThickness="1" BorderBrush="#586380" FontWeight="SemiBold"
-                Cursor="Hand" Click="BtnAddSongs_Click">
-                                        <Button.Resources>
-                                            <Style TargetType="{x:Type Border}">
-                                                <Setter Property="CornerRadius" Value="22"/>
-                                            </Style>
-                                        </Button.Resources>
-                                        <Button.Style>
-                                            <Style TargetType="{x:Type Button}">
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="{x:Type Button}">
-                                                            <Border x:Name="Bd" 
-                                        Background="{TemplateBinding Background}" 
-                                        BorderBrush="{TemplateBinding BorderBrush}" 
-                                        BorderThickness="{TemplateBinding BorderThickness}"
-                                        CornerRadius="22" Padding="{TemplateBinding Padding}">
-                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                                            </Border>
-                                                            <ControlTemplate.Triggers>
-                                                                <Trigger Property="IsMouseOver" Value="True">
-                                                                    <Setter TargetName="Bd" Property="Background" Value="#3E4C6E"/>
-                                                                    <Setter TargetName="Bd" Property="BorderBrush" Value="Transparent"/>
-                                                                </Trigger>
-                                                            </ControlTemplate.Triggers>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Style>
-                                        </Button.Style>
-                                    </Button>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="#5CD1FF"/>
+                                                    <Setter TargetName="Icon" Property="Fill" Value="#1B2338"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </ToggleButton.Template>
+                                </ToggleButton>
 
-                                    <Button x:Name="BtnRename"
-                Margin="0 0 12 0" Cursor="Hand" Click="BtnRename_Click"
-                Foreground="White"
-                BorderThickness="0" Padding="15 0" Height="40">
-                                        <Button.Template>
-                                            <ControlTemplate TargetType="{x:Type Button}">
-                                                <Border x:Name="Bd" Background="#1B2338" CornerRadius="20">
-                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="15 0">
-                                                        <Path Data="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" 
-                                  Fill="{TemplateBinding Foreground}" 
-                                  Width="14" Height="14" Stretch="Uniform" Margin="0 0 8 0"/>
-                                                        <TextBlock Text="Rename" FontWeight="SemiBold"/>
-                                                    </StackPanel>
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="Bd" Property="Background" Value="#3E4C6E"/>
-                                                        <Setter Property="Foreground" Value="White"/>
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Button.Template>
-                                    </Button>
+                                <Button Content="+ Add Songs" x:Name="BtnAddSongs"
+            Padding="20 0" Height="50" Margin="0 0 12 0"
+            Background="#1B2338" Foreground="White"
+            BorderThickness="0" FontWeight="SemiBold"
+            Cursor="Hand" Click="BtnAddSongs_Click">
+                                    <Button.Resources>
+                                        <Style TargetType="{x:Type Border}">
+                                            <Setter Property="CornerRadius" Value="25"/>
+                                        </Style>
+                                    </Button.Resources>
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <Border x:Name="Bd"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="25" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="#3E4C6E"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
 
-                                    <Button x:Name="BtnDelete"
-                Cursor="Hand" Click="BtnDelete_Click"
-                Foreground="White"
-                BorderThickness="0" Padding="15 0" Height="40">
-                                        <Button.Template>
-                                            <ControlTemplate TargetType="{x:Type Button}">
-                                                <Border x:Name="Bd" Background="#2F1818" CornerRadius="20" BorderBrush="#FF5C5C" BorderThickness="1">
-                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="15 0">
-                                                        <Path Data="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" 
-                                  Fill="{TemplateBinding Foreground}" 
-                                  Width="14" Height="14" Stretch="Uniform" Margin="0 0 8 0"/>
-                                                        <TextBlock Text="Delete" FontWeight="SemiBold"/>
-                                                    </StackPanel>
-                                                </Border>
-                                                <ControlTemplate.Triggers>
-                                                    <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="Bd" Property="Background" Value="#FF5C5C"/>
-                                                        <Setter Property="Foreground" Value="White"/>
-                                                    </Trigger>
-                                                </ControlTemplate.Triggers>
-                                            </ControlTemplate>
-                                        </Button.Template>
-                                    </Button>
-                                </StackPanel>
+                                <Button x:Name="BtnRename"
+            Margin="0 0 12 0" Cursor="Hand" Click="BtnRename_Click"
+            Foreground="White" Height="50"
+            BorderThickness="0" Padding="15 0">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <Border x:Name="Bd" Background="#1B2338" CornerRadius="25">
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="15 0">
+                                                    <Path Data="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" 
+                              Fill="{TemplateBinding Foreground}" 
+                              Width="14" Height="14" Stretch="Uniform" Margin="0 0 8 0"/>
+                                                    <TextBlock Text="Rename" FontWeight="SemiBold"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="#3E4C6E"/>
+                                                    <Setter Property="Foreground" Value="White"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+
+                                <Button x:Name="BtnDelete"
+            Cursor="Hand" Click="BtnDelete_Click"
+            Foreground="White" Height="50"
+            BorderThickness="0" Padding="15 0">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <Border x:Name="Bd" Background="darkred" CornerRadius="25">
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="15 0">
+                                                    <Path Data="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" 
+                              Fill="{TemplateBinding Foreground}" 
+                              Width="14" Height="14" Stretch="Uniform" Margin="0 0 8 0"/>
+                                                    <TextBlock Text="Delete" FontWeight="SemiBold"/>
+                                                </StackPanel>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Bd" Property="Background" Value="red"/>
+                                                    <Setter Property="Foreground" Value="White"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Button.Template>
+                                </Button>
+
                             </StackPanel>
+                        </StackPanel>
                         </Grid>
                     </Border>
 
-                    <ListView Grid.Row="1"
-                  x:Name="PlaylistSongList"
-                  MouseDoubleClick="PlaylistSongList_MouseDoubleClick"
-                  Background="Transparent"
-                  BorderThickness="0"
-                  Foreground="White"
-                  ItemContainerStyle="{StaticResource MusicListItemStyle}"
-                  Margin="0 0 0 10">
+                <ListView Grid.Row="1"
+                    x:Name="PlaylistSongList"
+                    MouseDoubleClick="PlaylistSongList_MouseDoubleClick"
+                    Background="Transparent"
+                    AllowDrop="True" 
+                    PreviewMouseLeftButtonDown="PlaylistList_PreviewMouseLeftButtonDown"
+                    PreviewMouseMove="PlaylistList_PreviewMouseMove"
+                    Drop="PlaylistList_Drop"
+                    BorderThickness="0"
+                    Foreground="White"
+                    ItemContainerStyle="{StaticResource MusicListItemStyle}"
+                    Margin="0 0 0 10">
 
                     <ListView.ItemTemplate>
                         <DataTemplate>
@@ -772,17 +831,24 @@
                                                 </Style>
                                             </ContextMenu.Resources>
 
-                                            <MenuItem Header="Save to Liked Songs" Click="Context_ToggleLike_Click">
+                                            <MenuItem x:Name="MenuRemoveFromPlaylist" Header="Remove from Playlist" Click="RemoveSong_Click">
+                                                <MenuItem.Icon>
+                                                    <Path Data="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" 
+                                                    Fill="White" Stretch="Uniform" Width="14" Height="14"/>
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+
+                                            <MenuItem x:Name="MenuLikeSong" Header="Save to Liked Songs" Click="Context_ToggleLike_Click">
                                                 <MenuItem.Icon>
                                                     <Path Data="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" 
-                      Fill="White" Stretch="Uniform" Width="14" Height="14"/>
+                                                    Fill="White" Stretch="Uniform" Width="14" Height="14"/>
                                                 </MenuItem.Icon>
                                             </MenuItem>
 
                                             <MenuItem Header="Add to playlist" x:Name="MenuAddToPlaylist">
                                                 <MenuItem.Icon>
                                                     <Path Data="M14 10H2v2h12v-2zm0-4H2v2h12V6zm4 8v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 16h8v-2H2v2z" 
-                      Fill="White" Stretch="Uniform" Width="14" Height="14"/>
+                                                    Fill="White" Stretch="Uniform" Width="14" Height="14"/>
                                                 </MenuItem.Icon>
 
                                                 <MenuItem Header="Loading..."/>

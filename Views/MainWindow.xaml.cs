@@ -600,11 +600,27 @@ namespace MusicPlayerApp.Views
                 {
                     p.Id,
                     p.Name,
-                    SongCount = $"{App.Playlists.GetSongsInPlaylist(p.Id).Count} items"
+                    SongCount = $"{App.Playlists.GetSongsInPlaylist(p.Id).Count} songs"
                 })
                 .ToList();
 
             PlaylistList.ItemsSource = playlists;
+        }
+
+        // Handler Tombol Shuffle di Halaman Playlist
+        private void BtnShufflePlaylist_Click(object sender, RoutedEventArgs e)
+        {
+            // Toggle state di Backend
+            App.Music.ToggleShuffle();
+
+            if (BtnShufflePlaylist.IsChecked == true && _currentPlaylistId != -1)
+            {
+                var songs = App.Playlists.GetSongsInPlaylist(_currentPlaylistId);
+                if (songs.Count > 0)
+                {
+                    App.Music.PlayQueue(songs); // PlayQueue akan otomatis mengacak jika Shuffle aktif
+                }
+            }
         }
 
         // --- 2. Event Handlers ---
@@ -751,8 +767,6 @@ namespace MusicPlayerApp.Views
             }
         }
 
-        // Di MainWindow.xaml.cs
-
         private void BtnAddSongs_Click(object sender, RoutedEventArgs e)
         {
             if (_currentPlaylistId == -1) return;
@@ -800,6 +814,72 @@ namespace MusicPlayerApp.Views
                 else if (duplicateCount > 0)
                 {
                     MessageBox.Show("Semua lagu yang dipilih sudah ada di playlist ini.");
+                }
+            }
+        }
+
+        //Drag and drop urutan playlist
+        // 1. Simpan posisi awal klik
+        private void PlaylistList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _dragStartPoint = e.GetPosition(null);
+        }
+
+        // 2. Deteksi gerakan drag
+        private void PlaylistList_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                Point position = e.GetPosition(null);
+                if (Math.Abs(position.X - _dragStartPoint.X) > SystemParameters.MinimumHorizontalDragDistance ||
+                    Math.Abs(position.Y - _dragStartPoint.Y) > SystemParameters.MinimumVerticalDragDistance)
+                {
+                    ListView listView = sender as ListView;
+                    ListViewItem listViewItem = FindAncestor<ListViewItem>((DependencyObject)e.OriginalSource);
+
+                    if (listViewItem == null) return;
+
+                    // Ambil data lagu yang sedang di-drag
+                    Song song = (Song)listView.ItemContainerGenerator.ItemFromContainer(listViewItem);
+
+                    if (song != null)
+                    {
+                        // Bungkus data dengan nama format unik "PlaylistDrag" agar tidak tertukar dengan Queue
+                        DataObject dragData = new DataObject("PlaylistDrag", song);
+                        DragDrop.DoDragDrop(listViewItem, dragData, DragDropEffects.Move);
+                    }
+                }
+            }
+        }
+
+        // 3. Eksekusi saat dilepas (DROP)
+        private void PlaylistList_Drop(object sender, DragEventArgs e)
+        {
+            if (_currentPlaylistId == -1) return;
+
+            if (e.Data.GetDataPresent("PlaylistDrag"))
+            {
+                Song sourceSong = e.Data.GetData("PlaylistDrag") as Song;
+                Song targetSong = ((FrameworkElement)e.OriginalSource).DataContext as Song;
+
+                if (sourceSong != null && targetSong != null && sourceSong.Id != targetSong.Id)
+                {
+                    // Ambil List lagu yang sedang tampil sekarang
+                    var currentList = PlaylistSongList.ItemsSource as List<Song>;
+                    if (currentList == null) return;
+
+                    int oldIndex = currentList.IndexOf(sourceSong);
+                    int newIndex = currentList.IndexOf(targetSong);
+
+                    if (oldIndex > -1 && newIndex > -1)
+                    {
+                        // 1. Panggil Controller untuk update Database
+                        // (Ini menggunakan fungsi yang Anda buat di langkah sebelumnya)
+                        App.Playlists.ReorderSong(_currentPlaylistId, oldIndex, newIndex);
+
+                        // 2. Refresh Tampilan agar urutan visual sesuai database
+                        OpenPlaylistDetail(_currentPlaylistId);
+                    }
                 }
             }
         }
@@ -1349,25 +1429,46 @@ namespace MusicPlayerApp.Views
             {
                 button.ContextMenu.DataContext = song; // Pass data lagu ke menu
 
-                // A. Update Teks Like (Dynamic)
-                var likeItem = button.ContextMenu.Items[0] as MenuItem;
+                // --- PERBAIKAN: Cari Item berdasarkan Nama atau Loop ---
+
+                // 1. Cari Item Remove & Atur Visibilitas
+                // Tombol Remove hanya boleh muncul jika kita sedang di dalam Playlist View
+                var removeItem = FindMenuItemByName(button.ContextMenu, "MenuRemoveFromPlaylist");
+                if (removeItem != null)
+                {
+                    // Jika sedang di Playlist (_isPlaylistView = true) -> Visible
+                    // Jika di All Songs / Discover -> Collapsed
+                    removeItem.Visibility = _isPlaylistView ? Visibility.Visible : Visibility.Collapsed;
+                }
+
+                // 2. Cari Item Like (Jangan pakai index [0] lagi)
+                var likeItem = FindMenuItemByName(button.ContextMenu, "MenuLikeSong");
                 if (likeItem != null)
                 {
+                    // Update teks sesuai status Like
                     likeItem.Header = song.IsLiked ? "Remove from Liked Songs" : "Save to Liked Songs";
                 }
 
-                // B. POPULATE SUBMENU PLAYLIST (SPOTIFY STYLE)
-                // Kita cari item "Add to playlist" (Item ke-1 di array)
-                var addToPlaylistItem = button.ContextMenu.Items[1] as MenuItem;
-
+                // 3. Cari Item Add To Playlist (Jangan pakai index [1] lagi)
+                var addToPlaylistItem = FindMenuItemByName(button.ContextMenu, "MenuAddToPlaylist");
                 if (addToPlaylistItem != null)
                 {
-                    // Panggil fungsi untuk mengisi submenu
                     PopulatePlaylistSubMenu(addToPlaylistItem, song);
                 }
 
                 button.ContextMenu.IsOpen = true;
             }
+        }
+        private MenuItem FindMenuItemByName(ContextMenu menu, string name)
+        {
+            foreach (var item in menu.Items)
+            {
+                if (item is MenuItem menuItem && menuItem.Name == name)
+                {
+                    return menuItem;
+                }
+            }
+            return null;
         }
 
         // 2. FUNGSI UNTUK MEMBUAT SUBMENU DINAMIS
@@ -1510,6 +1611,27 @@ namespace MusicPlayerApp.Views
             }
         }
 
+        private void RemoveSong_Click(object sender, RoutedEventArgs e)
+        {
+            // 1. Ambil MenuItem yang diklik
+            var menuItem = sender as MenuItem;
+
+            // 2. Ambil data Song dari DataContext MenuItem tersebut
+            var song = menuItem?.DataContext as Song;
+
+            // 3. Validasi
+            if (song != null && _currentPlaylistId != -1)
+            {
+                // 4. Panggil Controller
+                App.Playlists.RemoveSongFromPlaylist(_currentPlaylistId, song.Id);
+
+                // 5. Refresh tampilan Playlist agar lagu yang dihapus hilang dari layar
+                OpenPlaylistDetail(_currentPlaylistId);
+
+                MessageBox.Show($"Removed '{song.Title}' from playlist.");
+            }
+        }
+
         // 3. LOGIC PENCARIAN DI DALAM MENU
         private void SearchPlaylistMenu_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -1602,9 +1724,9 @@ namespace MusicPlayerApp.Views
                 // 2. Simpan ke Database
                 App.Db.ToggleLike(song.Id, song.IsLiked);
 
-                // 3. Feedback Visual (Optional)
-                // string status = song.IsLiked ? "Saved to Liked Songs" : "Removed from Liked Songs";
-                // MessageBox.Show(status);
+                // 3. Feedback Visual 
+                string status = song.IsLiked ? "Saved to Liked Songs" : "Removed from Liked Songs";
+                MessageBox.Show(status);
 
                 // 4. Jika sedang membuka halaman "Liked Songs", refresh agar lagu langsung hilang/muncul
                 if (_currentViewMode == "Liked")

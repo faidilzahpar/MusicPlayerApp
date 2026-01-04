@@ -27,6 +27,11 @@ namespace MusicPlayerApp.Controllers
 
         private int _queueIndex = -1; // Posisi lagu sekarang di antrian
 
+        // --- TAMBAHAN BARU UNTUK SHUFFLE ---
+        private List<Song> _originalQueue = new List<Song>(); // Backup antrian asli
+        public bool IsShuffleEnabled { get; private set; } = false;
+        private Random _rng = new Random();
+
         // Event agar UI tahu kalau lagu berganti (PENTING untuk update Judul/Cover)
         public event Action<Song> CurrentSongChanged;
         // --------------------------------------
@@ -255,34 +260,50 @@ namespace MusicPlayerApp.Controllers
         {
             if (songs == null || songs.Count == 0) return;
 
-            // A. Update Antrian (Bersihkan lama, isi baru)
+            // A. Reset Shuffle Backup karena ini Queue baru
+            _originalQueue.Clear();
+            // Opsional: Matikan shuffle saat ganti playlist (seperti Spotify)
+            // IsShuffleEnabled = false; 
+
+            // B. Update Antrian
             CurrentQueue.Clear();
             foreach (var song in songs)
             {
                 CurrentQueue.Add(song);
             }
 
-            // B. Tentukan Index Mulai
+            // C. Jika Shuffle sedang ON, simpan backup DULU baru acak
+            if (IsShuffleEnabled)
+            {
+                // Simpan urutan asli playlist ini sebelum diacak
+                _originalQueue = new List<Song>(CurrentQueue);
+
+                // Jika ada starting song, mainkan dia dulu, baru sisanya diacak
+                // Logic shuffle manual disini agar startingSong tetap dimainkan pertama
+                // (Untuk simplifikasi, kita panggil play biasa dulu, nanti user bisa klik shuffle lagi)
+            }
+
+            // D. Tentukan Index Mulai
             if (startingSong != null)
             {
-                // Cari lagu berdasarkan ID biar akurat
                 var foundSong = CurrentQueue.FirstOrDefault(s => s.Id == startingSong.Id);
-                if (foundSong != null)
-                {
-                    _queueIndex = CurrentQueue.IndexOf(foundSong);
-                }
-                else
-                {
-                    _queueIndex = 0;
-                }
+                if (foundSong != null) _queueIndex = CurrentQueue.IndexOf(foundSong);
+                else _queueIndex = 0;
             }
             else
             {
                 _queueIndex = 0;
             }
 
-            // C. Mainkan
+            // E. Mainkan
             PlayCurrentIndex();
+
+            // F. Jika Shuffle ON, lakukan pengacakan SETELAH lagu pertama mulai main
+            // Ini trik agar lagu yang diklik user tetap main duluan
+            if (IsShuffleEnabled)
+            {
+                ShuffleQueue();
+            }
         }
 
         // 2. Fungsi Next (Diupdate variabelnya)
@@ -314,6 +335,104 @@ namespace MusicPlayerApp.Controllers
             {
                 var song = CurrentQueue[_queueIndex];
                 PlaySong(song);
+            }
+        }
+
+        public void ToggleShuffle()
+        {
+            IsShuffleEnabled = !IsShuffleEnabled;
+
+            if (IsShuffleEnabled)
+            {
+                // 1. Aktifkan Shuffle
+                ShuffleQueue();
+            }
+            else
+            {
+                // 2. Matikan Shuffle (Kembalikan urutan asli)
+                UnshuffleQueue();
+            }
+        }
+
+        // FITUR SHUFFLE LOGIC
+        private void ShuffleQueue()
+        {
+            if (CurrentQueue.Count <= 1) return;
+
+            // A. Simpan urutan asli (Backup)
+            _originalQueue = new List<Song>(CurrentQueue);
+
+            // B. Ambil lagu yang sedang main sekarang
+            Song currentSong = null;
+            if (_queueIndex >= 0 && _queueIndex < CurrentQueue.Count)
+            {
+                currentSong = CurrentQueue[_queueIndex];
+            }
+
+            // C. Buat list sementara untuk diacak (tanpa lagu yang sedang main)
+            var listToShuffle = CurrentQueue.Where(s => s != currentSong).ToList();
+
+            // D. Algoritma Shuffle
+            int n = listToShuffle.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = _rng.Next(n + 1);
+                Song value = listToShuffle[k];
+                listToShuffle[k] = listToShuffle[n];
+                listToShuffle[n] = value;
+            }
+
+            // E. Susun Ulang Queue: [Lagu Sekarang] + [Lagu Acak]
+            CurrentQueue.Clear();
+            if (currentSong != null)
+            {
+                CurrentQueue.Add(currentSong);
+            }
+
+            foreach (var song in listToShuffle)
+            {
+                CurrentQueue.Add(song);
+            }
+
+            // F. Reset Index ke 0 (Karena lagu yang main sekarang ada di paling atas)
+            _queueIndex = 0;
+        }
+
+        private void UnshuffleQueue()
+        {
+            if (_originalQueue == null || _originalQueue.Count == 0) return;
+
+            // A. Cari lagu yang sedang main sekarang
+            Song currentSong = null;
+            if (_queueIndex >= 0 && _queueIndex < CurrentQueue.Count)
+            {
+                currentSong = CurrentQueue[_queueIndex];
+            }
+
+            // B. Kembalikan ke Queue Asli
+            CurrentQueue.Clear();
+            foreach (var song in _originalQueue)
+            {
+                CurrentQueue.Add(song);
+            }
+
+            // C. Cari posisi lagu yang sedang main di Queue Asli
+            if (currentSong != null)
+            {
+                // Cari index lagu tersebut di list asli
+                var index = CurrentQueue.IndexOf(CurrentQueue.FirstOrDefault(s => s.Id == currentSong.Id));
+
+                // Update pointer index agar playback lanjut dengan benar
+                if (index != -1)
+                {
+                    _queueIndex = index;
+                }
+                else
+                {
+                    // Kasus langka: Lagu yang dimainkan ternyata sudah dihapus dari original queue
+                    _queueIndex = 0;
+                }
             }
         }
 

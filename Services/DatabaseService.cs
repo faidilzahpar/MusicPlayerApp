@@ -266,6 +266,42 @@ namespace MusicPlayerApp.Services
             return last == null ? 0 : last.OrderIndex + 1;
         }
 
+        public void ReorderPlaylist(int playlistId, int oldIndex, int newIndex)
+        {
+            // 1. Ambil semua mapping lagu untuk playlist ini, urutkan berdasarkan posisi saat ini
+            var playlistSongs = _db.Table<PlaylistSong>()
+                                   .Where(ps => ps.PlaylistId == playlistId)
+                                   .OrderBy(ps => ps.OrderIndex)
+                                   .ToList();
+
+            // 2. Validasi index agar tidak out of bounds
+            if (oldIndex < 0 || oldIndex >= playlistSongs.Count ||
+                newIndex < 0 || newIndex >= playlistSongs.Count)
+            {
+                return;
+            }
+
+            // 3. Manipulasi urutan di Memori (List C#)
+            var itemToMove = playlistSongs[oldIndex];
+            playlistSongs.RemoveAt(oldIndex);
+            playlistSongs.Insert(newIndex, itemToMove);
+
+            // 4. Update Database dalam Transaksi (Batch Update)
+            // Kita loop semua item dan set OrderIndex sesuai urutan baru di List
+            _db.RunInTransaction(() =>
+            {
+                for (int i = 0; i < playlistSongs.Count; i++)
+                {
+                    // Update hanya jika index berbeda dari sebelumnya (Optimasi)
+                    if (playlistSongs[i].OrderIndex != i)
+                    {
+                        playlistSongs[i].OrderIndex = i;
+                        _db.Update(playlistSongs[i]);
+                    }
+                }
+            });
+        }
+
         public List<Song> GetSongsByPlaylist(int playlistId)
         {
             var query =

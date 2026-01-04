@@ -89,5 +89,11 @@ namespace MusicPlayerApp.Controllers
         {
             _db.RemoveSongFromPlaylist(playlistId, songId);
         }
+
+        // Pindahkan urutan lagu
+        public void ReorderSong(int playlistId, int oldIndex, int newIndex)
+        {
+            _db.ReorderPlaylist(playlistId, oldIndex, newIndex);
+        }
     }
 }
