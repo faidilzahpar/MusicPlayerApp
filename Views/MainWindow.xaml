@@ -1717,6 +1717,12 @@ Fill="White" Stretch="Uniform" Width="14" Height="14"/>
                     <TextBlock Text="Searching YouTube..." Foreground="#5CD1FF" FontSize="18" FontWeight="Bold"/>
                 </StackPanel>
             </Grid>
+            <Border x:Name="QueueOverlay" 
+Grid.Column="0" Grid.ColumnSpan="2"
+Background="Transparent"
+                Margin="0 0 0 85"
+Visibility="Collapsed"
+MouseLeftButtonDown="QueueOverlay_MouseDown"/>
 
             <Border x:Name="QueueDrawer" Grid.Column="1"
 Background="#1F2940"
@@ -1750,7 +1756,7 @@ Visibility="Collapsed">
             Click="BtnClearQueue_Click"/>
                     </Grid>
 
-                    <ListView Grid.Row="1" x:Name="QueueList"
+                    <ListView Grid.Row="1" x:Name="QueueList" 
       VirtualizingPanel.ScrollUnit="Pixel"
       Background="Transparent" BorderThickness="0"
       ScrollViewer.VerticalScrollBarVisibility="Auto"
@@ -2039,12 +2045,7 @@ Visibility="Collapsed">
 
                 </Grid>
             </Grid>
-        <Border x:Name="QueueOverlay" 
-Grid.Column="0" Grid.ColumnSpan="2"
-Background="Transparent"
-                Margin="0 0 0 85"
-Visibility="Collapsed"
-MouseLeftButtonDown="QueueOverlay_MouseDown"/>
+        
 
         
     </Grid>
